@@ -40,20 +40,38 @@ export class SeoService {
 
     if (metaTags.keywords) {
       this.meta.updateTag({ name: 'keywords', content: metaTags.keywords });
-    }
-
-    if (metaTags.image) {
+    }    if (metaTags.image) {
       this.meta.updateTag({ property: 'og:image', content: metaTags.image });
       this.meta.updateTag({ name: 'twitter:image', content: metaTags.image });
     }
 
     if (metaTags.url) {
       this.meta.updateTag({ property: 'og:url', content: metaTags.url });
-      this.meta.updateTag({ rel: 'canonical', href: metaTags.url });
+      this.updateCanonicalUrl(metaTags.url);
     }
 
     if (metaTags.type) {
       this.meta.updateTag({ property: 'og:type', content: metaTags.type });
+    }
+  }
+
+  private updateCanonicalUrl(url: string): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    // Find existing canonical link
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    
+    if (canonicalLink) {
+      // Update existing canonical link
+      canonicalLink.href = url;
+    } else {
+      // Create new canonical link
+      canonicalLink = document.createElement('link');
+      canonicalLink.rel = 'canonical';
+      canonicalLink.href = url;
+      document.head.appendChild(canonicalLink);
     }
   }
 
