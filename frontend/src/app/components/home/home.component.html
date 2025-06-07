@@ -1,6 +1,12 @@
 <div class="home-container">  <!-- Banner Image -->
   <div class="banner-section">
-    <img src="banner.png" alt="Nederlandse Liedjes" class="banner-image">
+    <img 
+      [appLazyLoadImage]="'banner.png'" 
+      alt="Nederlandse Liedjes" 
+      class="banner-image"
+      width="1200"
+      height="300"
+      loading="eager">
   </div>
 
   <!-- Header Section -->
@@ -48,17 +54,23 @@
             class="video-player"
             controls
             autoplay
+            preload="metadata"
+            [style.aspect-ratio]="'9/16'"
             (click)="$event.stopPropagation()"
             (play)="onVideoPlay(video)"
             (ended)="stopVideo()">
           </video>
-          
-          <!-- Cover Image -->
+            <!-- Cover Image -->
           <img 
             *ngIf="playingVideoId !== video.id"
-            [src]="getVideoThumbnail(video)" 
+            [appLazyLoadImage]="getVideoThumbnail(video)" 
             [alt]="video.title"
             class="cover-image"
+            [style.aspect-ratio]="'9/16'"
+            width="300"
+            height="533"
+            loading="lazy"
+            decoding="async"
             (error)="onImageError($event)">
           
           <!-- Play Button Overlay -->

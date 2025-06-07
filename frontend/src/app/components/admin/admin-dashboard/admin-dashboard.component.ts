@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { VideoService, Video } from '../../../services/video.service';
@@ -48,18 +48,17 @@ export class AdminDashboardComponent implements OnInit {
   respondingToMessage: MessageResponse | null = null;
   adminResponse = '';
   responseStatus = 'RESPONDED';
-
   constructor(
     private authService: AuthService,
     private videoService: VideoService,
     private userService: UserService,
     private messageService: MessageService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router
   ) {}
-
   ngOnInit(): void {
     if (!this.authService.isAdmin()) {
-      window.location.href = '/home';
+      this.router.navigate(['/home']);
       return;
     }
     this.initializeAddUserForm();

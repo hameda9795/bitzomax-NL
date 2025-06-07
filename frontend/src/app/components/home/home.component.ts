@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +7,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { RouterModule } from '@angular/router';
 import { VideoService } from '../../services/video.service';
 import { AuthService } from '../../services/auth.service';
+import { SeoService } from '../../services/seo.service';
+import { PerformanceService } from '../../services/performance.service';
+import { LazyLoadImageDirective } from '../../directives/lazy-load-image.directive';
 import { RegistrationPromptComponent } from '../auth/registration-prompt/registration-prompt.component';
 
 @Component({
@@ -19,12 +22,13 @@ import { RegistrationPromptComponent } from '../auth/registration-prompt/registr
     MatIconModule,
     MatChipsModule,
     RouterModule,
-    RegistrationPromptComponent
+    RegistrationPromptComponent,
+    LazyLoadImageDirective
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   videos: any[] = [];
   loading = true;
   error = '';
@@ -32,18 +36,42 @@ export class HomeComponent implements OnInit {
   playingVideoId: number | null = null;
   viewIncrementedVideos: Set<number> = new Set(); // Track which videos have had their view count incremented
   showRegistrationPrompt = false;
+  private isBrowser: boolean;
   categories = [
     { value: 'all', label: 'Alle video\'s' },
     { value: 'free', label: 'Gratis' },
     { value: 'premium', label: 'Premium' }
-  ];
-  constructor(
+  ];  constructor(
     private videoService: VideoService,
-    public authService: AuthService
-  ) {}
-
+    public authService: AuthService,
+    private seoService: SeoService,
+    private performanceService: PerformanceService,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
   ngOnInit(): void {
+    // Set SEO for home page
+    this.seoService.setPageMeta(
+      'Nederlandse Video Streaming Platform', 
+      'Ontdek een uitgebreide collectie van Nederlandse video content. Bekijk gratis en premium content op het beste streaming platform van Nederland.',
+      'video streaming, Nederlandse content, entertainment, Bitzomax, gratis videos, premium content'
+    );
+    
     this.loadVideos();
+  }
+
+  ngAfterViewInit(): void {
+    // Only run performance optimizations in browser
+    if (this.isBrowser) {
+      // Initialize performance optimizations after view is initialized
+      this.performanceService.addResourceHints();
+      this.performanceService.optimizeImageLoading();
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup if needed
   }
 
   loadVideos(): void {

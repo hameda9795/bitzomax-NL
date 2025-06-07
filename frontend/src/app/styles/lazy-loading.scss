@@ -1,0 +1,138 @@
+/* Lazy Loading Image Styles */
+img {
+  transition: opacity 0.3s ease-in-out;
+}
+
+img.loading {
+  opacity: 0.7;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+img.loaded {
+  opacity: 1;
+}
+
+img.error {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+/* Loading shimmer animation */
+@keyframes loading-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Aspect ratio preservation for images */
+.video-thumbnail img,
+.cover-image,
+.banner-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* Ensure proper aspect ratios to prevent CLS */
+.video-thumbnail {
+  position: relative;
+  overflow: hidden;
+}
+
+.video-thumbnail::before {
+  content: '';
+  display: block;
+  padding-bottom: 177.78%; /* 16:9 aspect ratio for 9:16 videos */
+}
+
+.video-thumbnail img,
+.video-thumbnail video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Performance optimizations */
+.video-card {
+  contain: layout style paint;
+  will-change: transform;
+}
+
+.video-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {  img,
+  .video-card {
+    transition: none;
+    animation: none;
+  }
+  
+  .loading-shimmer {
+    animation: none;
+  }
+  
+  @keyframes loading-shimmer {
+    from {
+      transform: none;
+    }
+    to {
+      transform: none;
+    }
+  }
+}
+
+/* Critical resource loading states */
+.banner-image.loading {
+  min-height: 200px;
+  background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Video player optimizations */
+video {
+  background: #000;
+  width: 100%;
+  height: auto;
+}
+
+video[poster] {
+  object-fit: cover;
+}
+
+/* Preload hints for critical images */
+.critical-image {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Image quality optimizations */
+img {
+  image-rendering: auto;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Focus styles for accessibility */
+img:focus,
+video:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* High DPI display optimizations */
+@media (min-resolution: 2dppx) {
+  img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}

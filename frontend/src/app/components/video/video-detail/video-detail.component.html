@@ -12,6 +12,10 @@
           controls 
           class="video-player"
           [poster]="getCoverImageUrl()"
+          preload="metadata"
+          [style.aspect-ratio]="'16/9'"
+          width="1200"
+          height="675"
           (play)="onVideoPlay()">
           Je browser ondersteunt geen video.
         </video>

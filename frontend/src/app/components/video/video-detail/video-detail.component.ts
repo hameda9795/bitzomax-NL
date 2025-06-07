@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { VideoService, Video } from '../../../services/video.service';
 import { AuthService } from '../../../services/auth.service';
+import { SeoService } from '../../../services/seo.service';
+import { PerformanceService } from '../../../services/performance.service';
 import { RegistrationPromptComponent } from '../../auth/registration-prompt/registration-prompt.component';
 
 @Component({
@@ -12,19 +14,20 @@ import { RegistrationPromptComponent } from '../../auth/registration-prompt/regi
   templateUrl: './video-detail.component.html',
   styleUrls: ['./video-detail.component.scss']
 })
-export class VideoDetailComponent implements OnInit {
+export class VideoDetailComponent implements OnInit, OnDestroy {
   video: Video | null = null;
   loading = true;
   error = '';
   canWatch = false;
   hasViewBeenIncremented = false;
   showRegistrationPrompt = false;
-  
-  constructor(
+    constructor(
     private route: ActivatedRoute,
     public router: Router,
     private videoService: VideoService,
-    public authService: AuthService
+    public authService: AuthService,
+    private seoService: SeoService,
+    private performanceService: PerformanceService
   ) {}
 
   ngOnInit(): void {
@@ -35,6 +38,17 @@ export class VideoDetailComponent implements OnInit {
       }
     });
   }
+
+  ngOnDestroy(): void {
+    // Clean up any structured data when leaving the component
+    if (typeof document !== 'undefined') {
+      const existingScript = document.querySelector('script[type="application/ld+json"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    }
+  }
+
   loadVideo(id: number): void {
     this.loading = true;
     this.videoService.getVideo(id).subscribe({
@@ -42,6 +56,9 @@ export class VideoDetailComponent implements OnInit {
         this.video = video;
         this.canWatch = this.checkCanWatch(video);
         this.loading = false;
+        
+        // Update SEO meta tags for this video
+        this.updateVideoSeo(video);
       },
       error: (error: any) => {
         this.error = 'Video niet gevonden';
@@ -50,6 +67,18 @@ export class VideoDetailComponent implements OnInit {
       }
     });
   }
+  private updateVideoSeo(video: Video): void {
+    // Set dynamic title using seoTitle or fallback to title
+    const pageTitle = video.seoTitle || video.title;
+    this.seoService.updateTitle(`${pageTitle} - Bitzomax`);
+    
+    // Set video-specific meta tags
+    this.seoService.updateVideoMeta(video, `https://bitzomax.nl/video/${video.id}`);
+    
+    // Add structured data for the video
+    this.seoService.addVideoStructuredData(video);
+  }
+
   checkCanWatch(video: Video): boolean {
     // First check if user is authenticated
     if (!this.authService.isAuthenticated()) {
@@ -61,6 +90,7 @@ export class VideoDetailComponent implements OnInit {
     if (video.contentType === 'FREE') return true;
     return this.authService.isAuthenticated() && this.authService.getCurrentUser()?.premium;
   }
+
   incrementView(id: number): void {
     if (this.canWatch && !this.hasViewBeenIncremented) {
       this.hasViewBeenIncremented = true;
@@ -144,6 +174,7 @@ export class VideoDetailComponent implements OnInit {
   getCoverImageUrl(): string {
     return this.video ? this.videoService.getCoverImageUrl(this.video.coverImageUrl) : '';
   }
+
   goBack(): void {
     this.router.navigate(['/home']);
   }
