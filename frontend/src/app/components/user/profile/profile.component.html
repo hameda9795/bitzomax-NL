@@ -1,0 +1,588 @@
+<div class="profile-container" *ngIf="!loading && user">  <!-- Hero Profile Header -->
+  <div class="profile-hero">
+    <div class="hero-content">
+      <!-- Hero Avatar -->
+      <div class="hero-avatar">
+        <div class="avatar-container">
+          <div class="user-avatar">
+            <span class="avatar-initial">{{ user.username.charAt(0).toUpperCase() }}</span>
+          </div>
+          <div class="status-indicator"></div>
+        </div>
+      </div>
+
+      <!-- Hero Info -->
+      <div class="hero-info">
+        <div class="user-title">
+          <h1 class="username">{{ user.username }}</h1>
+          <span class="verified-badge" *ngIf="user.premium">
+            <mat-icon>star</mat-icon>
+            Premium
+          </span>
+          <span class="admin-badge" *ngIf="user.roles.includes('ROLE_ADMIN')">
+            <mat-icon>admin_panel_settings</mat-icon>
+            Administrator
+          </span>
+        </div>
+        
+        <div class="user-meta">
+          <div class="meta-item">
+            <mat-icon>email</mat-icon>
+            <span>{{ user.email }}</span>
+          </div>
+          <div class="meta-item">
+            <mat-icon>calendar_today</mat-icon>
+            <span>Lid sinds {{ user.createdAt | date:'MMMM yyyy' }}</span>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <a class="action-btn primary" *ngIf="isAdmin()" routerLink="/admin">
+            <mat-icon>dashboard</mat-icon>
+            <span>Beheerderspaneel</span>
+          </a>          <button class="action-btn danger" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Uitloggen</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Tab Navigation -->
+  <div class="profile-tabs">
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" animationDuration="300ms" (selectedTabChange)="onTabChange()">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>dashboard</mat-icon>
+          <span>Profiel</span>
+        </ng-template>
+        <div class="tab-content">
+          <!-- Stats Cards -->
+          <div class="stats-cards">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-title">Account Status</span>
+                <mat-icon class="stat-icon">account_circle</mat-icon>
+              </div>
+              <div class="stat-value">Actief</div>
+              <div class="stat-change positive">
+                <mat-icon>trending_up</mat-icon>
+                <span>Online</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-title">Gelikte Video's</span>
+                <mat-icon class="stat-icon">favorite</mat-icon>
+              </div>
+              <div class="stat-value">{{ likedVideos.length }}</div>
+              <div class="stat-change positive">
+                <mat-icon>add</mat-icon>
+                <span>+{{ likedVideos.length > 0 ? '1' : '0' }} deze week</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-title">Favorieten</span>
+                <mat-icon class="stat-icon">star</mat-icon>
+              </div>
+              <div class="stat-value">{{ favoriteVideos.length }}</div>
+              <div class="stat-change positive">
+                <mat-icon>star</mat-icon>
+                <span>Top collectie</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-title">Lid sinds</span>
+                <mat-icon class="stat-icon">calendar_today</mat-icon>
+              </div>
+              <div class="stat-value">{{ getDaysSinceJoined() }}</div>
+              <div class="stat-change positive">
+                <mat-icon>access_time</mat-icon>
+                <span>dagen</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account Information -->
+          <div class="account-info">
+            <div class="info-grid">
+              <div class="info-card">
+                <h3 class="card-title">
+                  <mat-icon>person</mat-icon>
+                  Account Details
+                </h3>
+                <div class="info-item">
+                  <span class="item-label">Gebruikersnaam:</span>
+                  <span class="item-value">{{ user.username }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="item-label">E-mail:</span>
+                  <span class="item-value email">{{ user.email }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="item-label">Account Type:</span>
+                  <span class="item-value status" [class]="user.premium ? 'active' : 'inactive'">
+                    {{ user.premium ? 'Premium' : 'Standaard' }}
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="item-label">Rol:</span>
+                  <span class="item-value">{{ user.roles.includes('ROLE_ADMIN') ? 'Administrator' : 'Gebruiker' }}</span>
+                </div>
+              </div>
+              
+              <div class="info-card">
+                <h3 class="card-title">
+                  <mat-icon>settings</mat-icon>
+                  Voorkeuren
+                </h3>
+                <div class="info-item">
+                  <span class="item-label">Thema:</span>
+                  <span class="item-value">Donker</span>
+                </div>
+                <div class="info-item">
+                  <span class="item-label">Taal:</span>
+                  <span class="item-value">Nederlands</span>
+                </div>
+                <div class="info-item">
+                  <span class="item-label">Notificaties:</span>
+                  <span class="item-value status active">Ingeschakeld</span>
+                </div>
+                <div class="info-item">
+                  <span class="item-label">Privacy:</span>
+                  <span class="item-value">Privé</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>favorite</mat-icon>
+          <span>Gelikte Video's</span>
+          <span class="tab-count">{{ likedVideos.length }}</span>
+        </ng-template>        <div class="tab-content">
+          <div class="videos-section" *ngIf="likedVideos.length > 0; else noLikedVideos">
+            <div class="videos-grid">              <div *ngFor="let video of likedVideos" class="video-card" (click)="playVideo(video)">
+                <!-- Video Thumbnail with 9:16 Aspect Ratio -->
+                <div class="video-thumbnail">
+                  <!-- Video Player (Hidden by default) -->
+                  <video 
+                    #videoPlayer
+                    *ngIf="playingVideoId === video.id && canWatchVideo(video)"
+                    [src]="getVideoUrl(video.videoUrl)" 
+                    class="video-player"
+                    controls
+                    autoplay
+                    (click)="$event.stopPropagation()"
+                    (play)="onVideoPlay(video)"
+                    (ended)="stopVideo()"
+                    (pause)="stopVideo()">
+                  </video>
+                  
+                  <!-- Stop Button Overlay for playing video -->
+                  <div *ngIf="playingVideoId === video.id" class="stop-overlay">
+                    <button class="stop-button" (click)="stopVideo(); $event.stopPropagation()">
+                      <mat-icon>stop</mat-icon>
+                    </button>
+                  </div>
+                  
+                  <!-- Cover Image -->
+                  <img 
+                    *ngIf="playingVideoId !== video.id"
+                    [src]="getVideoThumbnail(video)" 
+                    [alt]="video.title"
+                    class="cover-image"
+                    (error)="onImageError($event)">
+                  
+                  <!-- Play Button Overlay -->
+                  <div *ngIf="playingVideoId !== video.id" class="play-overlay">
+                    <div class="play-button">
+                      <mat-icon>{{ canWatchVideo(video) ? 'play_arrow' : 'lock' }}</mat-icon>
+                    </div>
+                  </div>
+                  
+                  <!-- Premium Badge -->
+                  <div *ngIf="video.contentType === 'PREMIUM'" class="premium-badge">
+                    <mat-icon>star</mat-icon>
+                    <span>Premium</span>
+                  </div>
+                  
+                  <!-- Duration Badge -->
+                  <div *ngIf="video.duration" class="duration-badge">
+                    {{ formatDuration(video.duration) }}
+                  </div>
+                </div>
+
+                <!-- Video Info -->
+                <div class="video-info">
+                  <h3 class="video-title">{{ video.title }}</h3>
+                  <p class="video-description" *ngIf="video.description">{{ video.description }}</p>
+                  
+                  <div class="video-meta">
+                    <span class="views">
+                      <span class="icon">👁️</span>
+                      {{ formatViews(video.viewCount || 0) }}
+                    </span>
+                    <span class="likes">
+                      <span class="icon">❤️</span>
+                      {{ video.likeCount || 0 }}
+                    </span>
+                    <span class="content-type" [class.premium]="video.contentType === 'PREMIUM'">
+                      <span class="icon">{{ video.contentType === 'PREMIUM' ? '⭐' : '🆓' }}</span>
+                      {{ video.contentType === 'PREMIUM' ? 'Premium' : 'Gratis' }}
+                    </span>
+                  </div>
+
+                  <!-- Hashtags -->
+                  <div class="hashtags" *ngIf="video.hashtags">
+                    <span class="hashtag" *ngFor="let tag of video.hashtags.split(',').slice(0, 3)">
+                      {{ tag.trim() }}
+                    </span>
+                  </div>
+
+                  <!-- External Links -->
+                  <div class="external-links" *ngIf="hasExternalLinks(video)">
+                    <div class="platform-links">
+                      <a *ngIf="video.spotifyLink" [href]="video.spotifyLink" target="_blank" class="platform-link spotify-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">🎵</span>
+                      </a>
+                      <a *ngIf="video.amazonLink" [href]="video.amazonLink" target="_blank" class="platform-link amazon-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">🛒</span>
+                      </a>
+                      <a *ngIf="video.appleMusicLink" [href]="video.appleMusicLink" target="_blank" class="platform-link apple-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">🍎</span>
+                      </a>
+                      <a *ngIf="video.itunesLink" [href]="video.itunesLink" target="_blank" class="platform-link itunes-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">📱</span>
+                      </a>
+                      <a *ngIf="video.youtubeMusicLink" [href]="video.youtubeMusicLink" target="_blank" class="platform-link youtube-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">▶️</span>
+                      </a>
+                      <a *ngIf="video.instagramLink" [href]="video.instagramLink" target="_blank" class="platform-link instagram-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">📷</span>
+                      </a>
+                    </div>
+                  </div>
+                    <!-- Action Buttons -->
+                  <div class="video-actions" *ngIf="authService.isAuthenticated()">
+                    <button 
+                      class="action-btn like-btn" 
+                      [class.liked]="video.isLiked"
+                      (click)="$event.stopPropagation(); toggleLike(video)"
+                      title="{{ video.isLiked ? 'Unlike this video' : 'Like this video' }}">
+                      <mat-icon class="btn-icon">favorite</mat-icon>
+                      <span class="btn-text">Like</span>
+                    </button>
+                    
+                    <button 
+                      class="action-btn favorite-btn" 
+                      [class.favorited]="video.isFavorited"
+                      (click)="$event.stopPropagation(); toggleFavorite(video)"
+                      title="{{ video.isFavorited ? 'Remove from favorites' : 'Add to favorites' }}">
+                      <mat-icon class="btn-icon">star</mat-icon>
+                      <span class="btn-text">Favorite</span>
+                    </button>
+                    
+                    <button 
+                      class="action-btn unlike-btn" 
+                      (click)="$event.stopPropagation(); unlikeVideo(video.id)"
+                      title="Remove from liked videos">
+                      <mat-icon class="btn-icon">close</mat-icon>
+                      <span class="btn-text">Remove</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #noLikedVideos>
+            <div class="empty-state">
+              <mat-icon>favorite_border</mat-icon>
+              <h3>Geen gelikte video's</h3>
+              <p>Je hebt nog geen video's geliket. Ga naar de videolijst om video's te liken!</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>star</mat-icon>
+          <span>Favorieten</span>
+          <span class="tab-count">{{ favoriteVideos.length }}</span>
+        </ng-template>        <div class="tab-content">
+          <div class="videos-section" *ngIf="favoriteVideos.length > 0; else noFavoriteVideos">
+            <div class="videos-grid">              <div *ngFor="let video of favoriteVideos" class="video-card" (click)="playVideo(video)">
+                <!-- Video Thumbnail with 9:16 Aspect Ratio -->
+                <div class="video-thumbnail">
+                  <!-- Video Player (Hidden by default) -->
+                  <video 
+                    #videoPlayer
+                    *ngIf="playingVideoId === video.id && canWatchVideo(video)"
+                    [src]="getVideoUrl(video.videoUrl)" 
+                    class="video-player"
+                    controls
+                    autoplay
+                    (click)="$event.stopPropagation()"
+                    (play)="onVideoPlay(video)"
+                    (ended)="stopVideo()"
+                    (pause)="stopVideo()">
+                  </video>
+                  
+                  <!-- Stop Button Overlay for playing video -->
+                  <div *ngIf="playingVideoId === video.id" class="stop-overlay">
+                    <button class="stop-button" (click)="stopVideo(); $event.stopPropagation()">
+                      <mat-icon>stop</mat-icon>
+                    </button>
+                  </div>
+                  
+                  <!-- Cover Image -->
+                  <img 
+                    *ngIf="playingVideoId !== video.id"
+                    [src]="getVideoThumbnail(video)" 
+                    [alt]="video.title"
+                    class="cover-image"
+                    (error)="onImageError($event)">
+                  
+                  <!-- Play Button Overlay -->
+                  <div *ngIf="playingVideoId !== video.id" class="play-overlay">
+                    <div class="play-button">
+                      <mat-icon>{{ canWatchVideo(video) ? 'play_arrow' : 'lock' }}</mat-icon>
+                    </div>
+                  </div>
+                  
+                  <!-- Premium Badge -->
+                  <div *ngIf="video.contentType === 'PREMIUM'" class="premium-badge">
+                    <mat-icon>star</mat-icon>
+                    <span>Premium</span>
+                  </div>
+                  
+                  <!-- Duration Badge -->
+                  <div *ngIf="video.duration" class="duration-badge">
+                    {{ formatDuration(video.duration) }}
+                  </div>
+                </div>
+
+                <!-- Video Info -->
+                <div class="video-info">
+                  <h3 class="video-title">{{ video.title }}</h3>
+                  <p class="video-description" *ngIf="video.description">{{ video.description }}</p>
+                  
+                  <div class="video-meta">
+                    <span class="views">
+                      <span class="icon">👁️</span>
+                      {{ formatViews(video.viewCount || 0) }}
+                    </span>
+                    <span class="likes">
+                      <span class="icon">❤️</span>
+                      {{ video.likeCount || 0 }}
+                    </span>
+                    <span class="content-type" [class.premium]="video.contentType === 'PREMIUM'">
+                      <span class="icon">{{ video.contentType === 'PREMIUM' ? '⭐' : '🆓' }}</span>
+                      {{ video.contentType === 'PREMIUM' ? 'Premium' : 'Gratis' }}
+                    </span>
+                  </div>
+
+                  <!-- Hashtags -->
+                  <div class="hashtags" *ngIf="video.hashtags">
+                    <span class="hashtag" *ngFor="let tag of video.hashtags.split(',').slice(0, 3)">
+                      {{ tag.trim() }}
+                    </span>
+                  </div>
+
+                  <!-- External Links -->
+                  <div class="external-links" *ngIf="hasExternalLinks(video)">
+                    <div class="platform-links">
+                      <a *ngIf="video.spotifyLink" [href]="video.spotifyLink" target="_blank" class="platform-link spotify-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">🎵</span>
+                      </a>
+                      <a *ngIf="video.amazonLink" [href]="video.amazonLink" target="_blank" class="platform-link amazon-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">🛒</span>
+                      </a>
+                      <a *ngIf="video.appleMusicLink" [href]="video.appleMusicLink" target="_blank" class="platform-link apple-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">🍎</span>
+                      </a>
+                      <a *ngIf="video.itunesLink" [href]="video.itunesLink" target="_blank" class="platform-link itunes-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">📱</span>
+                      </a>
+                      <a *ngIf="video.youtubeMusicLink" [href]="video.youtubeMusicLink" target="_blank" class="platform-link youtube-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">▶️</span>
+                      </a>
+                      <a *ngIf="video.instagramLink" [href]="video.instagramLink" target="_blank" class="platform-link instagram-link" (click)="$event.stopPropagation()">
+                        <span class="platform-logo">📷</span>
+                      </a>
+                    </div>
+                  </div>
+                    <!-- Action Buttons -->
+                  <div class="video-actions" *ngIf="authService.isAuthenticated()">
+                    <button 
+                      class="action-btn like-btn" 
+                      [class.liked]="video.isLiked"
+                      (click)="$event.stopPropagation(); toggleLike(video)"
+                      title="{{ video.isLiked ? 'Unlike this video' : 'Like this video' }}">
+                      <mat-icon class="btn-icon">favorite</mat-icon>
+                      <span class="btn-text">Like</span>
+                    </button>
+                    
+                    <button 
+                      class="action-btn favorite-btn" 
+                      [class.favorited]="video.isFavorited"
+                      (click)="$event.stopPropagation(); toggleFavorite(video)"
+                      title="{{ video.isFavorited ? 'Remove from favorites' : 'Add to favorites' }}">
+                      <mat-icon class="btn-icon">star</mat-icon>
+                      <span class="btn-text">Favorite</span>
+                    </button>
+                    
+                    <button 
+                      class="action-btn unfavorite-btn" 
+                      (click)="$event.stopPropagation(); removeFavorite(video.id)"
+                      title="Remove from favorites">
+                      <mat-icon class="btn-icon">close</mat-icon>
+                      <span class="btn-text">Remove</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><ng-template #noFavoriteVideos>
+            <div class="empty-state">
+              <mat-icon>star_border</mat-icon>
+              <h3>Geen favorieten</h3>
+              <p>Je hebt nog geen favoriete video's. Voeg video's toe aan je favorieten!</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>message</mat-icon>
+          <span>Berichten</span>
+          <span class="tab-count" *ngIf="unreadMessagesCount > 0">{{ unreadMessagesCount }}</span>
+        </ng-template>
+        
+        <div class="messages-content">
+          <!-- Messages Header -->
+          <div class="messages-header">
+            <h3>Mijn Berichten</h3>
+            <p>Bekijk je contactberichten en antwoorden van ons team</p>
+          </div>
+
+          <!-- Messages List -->
+          <div class="messages-list" *ngIf="userMessages.length > 0; else noMessages">
+            <div class="message-card" *ngFor="let message of userMessages" 
+                 [class.unread]="message.status === 'PENDING' || message.status === 'READ'"
+                 [class.responded]="message.status === 'RESPONDED'">
+              
+              <div class="message-header">
+                <div class="message-info">
+                  <h4>{{ message.subject }}</h4>
+                  <div class="message-meta">
+                    <span class="message-date">{{ formatDate(message.createdAt) }}</span>
+                    <span class="message-status" [ngClass]="'status-' + message.status.toLowerCase()">
+                      {{ getStatusText(message.status) }}
+                    </span>
+                  </div>
+                </div>
+                <button class="expand-btn" (click)="toggleMessage(message.id)">
+                  <mat-icon>{{ expandedMessages.has(message.id) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </button>
+              </div>
+
+              <div class="message-content" *ngIf="expandedMessages.has(message.id)">
+                <div class="original-message">
+                  <div class="message-section">
+                    <label>Onderwerp:</label>
+                    <span>{{ message.reason }}</span>
+                  </div>
+                  <div class="message-section">
+                    <label>Bericht:</label>
+                    <p>{{ message.message }}</p>
+                  </div>
+                </div>
+
+                <!-- Admin Response -->
+                <div class="admin-response" *ngIf="message.adminResponse">
+                  <div class="response-header">
+                    <mat-icon>reply</mat-icon>
+                    <span>Antwoord van {{ message.respondedBy || 'Support Team' }}</span>
+                    <span class="response-date">{{ message.respondedAt ? formatDate(message.respondedAt) : 'No response date' }}</span>
+                  </div>
+                  <div class="response-content">
+                    <p>{{ message.adminResponse }}</p>
+                  </div>
+                </div>
+
+                <!-- Message Actions -->
+                <div class="message-actions" *ngIf="message.status === 'RESPONDED'">
+                  <button class="reply-btn" (click)="replyToMessage(message)" *ngIf="!showReplyForm[message.id]">
+                    <mat-icon>reply</mat-icon>
+                    Antwoorden
+                  </button>
+                </div>
+
+                <!-- Reply Form -->
+                <div class="reply-form" *ngIf="showReplyForm[message.id]">
+                  <h5>Reageer op dit bericht</h5>
+                  <textarea 
+                    [(ngModel)]="replyText[message.id]" 
+                    placeholder="Typ je reactie hier..."
+                    rows="4"
+                    class="reply-textarea"></textarea>
+                  <div class="reply-actions">
+                    <button class="send-reply-btn" (click)="sendReply(message.id)" 
+                            [disabled]="!replyText[message.id] || !replyText[message.id].trim()">
+                      <mat-icon>send</mat-icon>
+                      Versturen
+                    </button>
+                    <button class="cancel-reply-btn" (click)="cancelReply(message.id)">
+                      Annuleren
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- No Messages State -->
+          <ng-template #noMessages>
+            <div class="empty-state">
+              <mat-icon>message</mat-icon>
+              <h3>Geen berichten</h3>
+              <p>Je hebt nog geen berichten verzonden. Gebruik ons contactformulier om contact op te nemen!</p>
+              <button class="contact-btn" routerLink="/contact">
+                <mat-icon>send</mat-icon>
+                Contact opnemen
+              </button>
+            </div>
+          </ng-template>
+
+          <!-- Pagination -->
+          <div class="messages-pagination" *ngIf="totalMessagesPages > 1">
+            <button class="page-btn" (click)="loadMessages(currentMessagesPage - 1)" 
+                    [disabled]="currentMessagesPage === 0">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <span class="page-info">{{ currentMessagesPage + 1 }} / {{ totalMessagesPages }}</span>
+            <button class="page-btn" (click)="loadMessages(currentMessagesPage + 1)" 
+                    [disabled]="currentMessagesPage >= totalMessagesPages - 1">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div></div>
+
+<div class="loading" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Profiel laden...</p>
+</div>

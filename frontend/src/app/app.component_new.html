@@ -1,0 +1,39 @@
+<div class="app-container">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <a routerLink="/home" class="brand-link">
+        <h1>🎬 Bitzomax</h1>
+      </a>
+    </div>
+    
+    <div class="nav-links">
+      <a routerLink="/home" routerLinkActive="active">Home</a>
+      
+      @if (isLoggedIn) {
+        <a routerLink="/profile" routerLinkActive="active">Profiel</a>
+        @if (isAdmin) {
+          <a routerLink="/admin" routerLinkActive="active">Admin</a>
+        }
+        <button class="btn-logout" (click)="logout()">Uitloggen</button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="active">Inloggen</a>
+        <a routerLink="/register" routerLinkActive="active">Registreren</a>
+      }
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p>&copy; 2025 Bitzomax - Nederlandse Video Streaming Platform</p>
+      <div class="footer-links">
+        <a href="#">Privacy</a>
+        <a href="#">Algemene Voorwaarden</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+</div>
