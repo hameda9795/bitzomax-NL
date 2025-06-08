@@ -1,5 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -188,11 +189,10 @@ export class PerformanceService {
   // Resource hints for better performance
   addResourceHints() {
     if (!this.isBrowser) return;
-    
-    const hints = [
+      const hints = [
       { rel: 'dns-prefetch', href: '//fonts.googleapis.com' },
-      { rel: 'dns-prefetch', href: '//localhost:8080' },
-      { rel: 'preconnect', href: 'http://localhost:8080' }
+      { rel: 'dns-prefetch', href: '//91.99.49.208:8082' },
+      { rel: 'preconnect', href: environment.apiUrl }
     ];
 
     hints.forEach(hint => {

@@ -2,6 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
 import { Video } from './video.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -76,10 +77,9 @@ export class SeoService {
   }
 
   updateVideoMeta(video: Video, currentUrl?: string): void {
-    const seoTitle = video.seoTitle || video.title;
-    const seoDescription = video.seoDescription || video.description || `Bekijk ${video.title} op Bitzomax`;
+    const seoTitle = video.seoTitle || video.title;    const seoDescription = video.seoDescription || video.description || `Bekijk ${video.title} op Bitzomax`;
     const seoKeywords = video.seoKeywords || video.hashtags || 'nederlandse video, streaming, bitzomax';
-    const imageUrl = video.coverImageUrl ? `http://localhost:8080/uploads/${video.coverImageUrl}` : '';
+    const imageUrl = video.coverImageUrl ? `${environment.uploadsUrl}/${video.coverImageUrl}` : '';
 
     this.updateMetaTags({
       title: `${seoTitle} | Bitzomax`,
@@ -110,7 +110,7 @@ export class SeoService {
       "@type": "VideoObject",
       "name": video.seoTitle || video.title,
       "description": video.seoDescription || video.description,
-      "thumbnailUrl": video.coverImageUrl ? `http://localhost:8080/uploads/${video.coverImageUrl}` : '',
+      "thumbnailUrl": video.coverImageUrl ? `${environment.uploadsUrl}/${video.coverImageUrl}` : '',
       "uploadDate": video.createdAt,
       "duration": video.duration ? `PT${Math.floor(video.duration / 60)}M${video.duration % 60}S` : undefined,
       "interactionStatistic": [
@@ -128,10 +128,10 @@ export class SeoService {
       "publisher": {
         "@type": "Organization",
         "name": "Bitzomax",
-        "url": "http://localhost:4200"
+        "url": "http://91.99.49.208"
       },
-      "contentUrl": video.videoUrl ? `http://localhost:8080/uploads/${video.videoUrl}` : '',
-      "embedUrl": `http://localhost:4200/video/${video.id}`,
+      "contentUrl": video.videoUrl ? `${environment.uploadsUrl}/${video.videoUrl}` : '',
+      "embedUrl": `http://91.99.49.208/video/${video.id}`,
       "inLanguage": "nl-NL",
       "isAccessibleForFree": video.contentType === 'FREE',
       "keywords": video.seoKeywords || video.hashtags

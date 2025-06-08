@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../../environments/environment';
 
 export interface Video {
   id: number;
@@ -64,7 +65,7 @@ export interface PageResponse<T> {
   providedIn: 'root'
 })
 export class VideoService {
-  private apiUrl = 'http://localhost:8080/api/videos';
+  private apiUrl = `${environment.apiUrl}/api/videos`;
 
   constructor(
     private http: HttpClient,
@@ -173,12 +174,11 @@ export class VideoService {
       headers: this.authService.getAuthHeaders()
     });
   }
-
   getVideoUrl(videoPath: string): string {
-    return `http://localhost:8080/uploads/${videoPath}`;
+    return `${environment.uploadsUrl}/${videoPath}`;
   }
 
   getCoverImageUrl(imagePath: string): string {
-    return `http://localhost:8080/uploads/${imagePath}`;
+    return `${environment.uploadsUrl}/${imagePath}`;
   }
 }
