@@ -58,3 +58,4 @@ Thumbs.db
 
 # Uploads (if you don't want to include uploaded files)
 backend/uploads/
+*.backup
