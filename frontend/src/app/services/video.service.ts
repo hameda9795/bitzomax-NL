@@ -65,7 +65,7 @@ export interface PageResponse<T> {
   providedIn: 'root'
 })
 export class VideoService {
-  private apiUrl = `${environment.apiUrl}/api/videos`;
+  private apiUrl = `${environment.apiUrl}/videos`;
 
   constructor(
     private http: HttpClient,

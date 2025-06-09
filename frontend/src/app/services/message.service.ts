@@ -53,7 +53,7 @@ export interface PageResponse<T> {
   providedIn: 'root'
 })
 export class MessageService {
-  private apiUrl = `${environment.apiUrl}/api/messages`;
+  private apiUrl = `${environment.apiUrl}/messages`;
 
   constructor(
     private http: HttpClient,

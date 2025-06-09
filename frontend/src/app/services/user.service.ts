@@ -45,7 +45,7 @@ export interface PageResponse<T> {
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = `${environment.apiUrl}/api/admin`;
+  private apiUrl = `${environment.apiUrl}/admin`;
 
   constructor(
     private http: HttpClient,
