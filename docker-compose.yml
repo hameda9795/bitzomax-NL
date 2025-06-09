@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: bitzomax_postgres
+    environment:
+      POSTGRES_DB: bitzomax
+      POSTGRES_USER: bitzomax
+      POSTGRES_PASSWORD: bitzomax_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - bitzomax-network
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bitzomax_backend
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bitzomax
+      - SPRING_DATASOURCE_USERNAME=bitzomax
+      - SPRING_DATASOURCE_PASSWORD=bitzomax_password
+    volumes:
+      - uploads_data:/opt/bitzomax/uploads
+    ports:
+      - "8082:8082"
+    restart: always
+    networks:
+      - bitzomax-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bitzomax_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - bitzomax-network
+
+networks:
+  bitzomax-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  uploads_data:
