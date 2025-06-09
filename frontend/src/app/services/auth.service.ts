@@ -32,7 +32,7 @@ const USER_KEY = 'auth-user';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/api/auth`;
+  private apiUrl = `${environment.apiUrl}/auth`;
   private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
 
   constructor(

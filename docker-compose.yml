@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   postgres:
     image: postgres:latest
@@ -43,6 +42,9 @@ services:
     container_name: bitzomax_frontend
     ports:
       - "8000:80"
+      - "8443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - backend
     restart: always
