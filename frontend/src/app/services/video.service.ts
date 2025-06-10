@@ -169,6 +169,28 @@ export class VideoService {
     });
   }
 
+  updateVideo(id: number, videoData: VideoRequest, videoFile?: File, coverImage?: File): Observable<Video> {
+    const formData = new FormData();
+    
+    Object.keys(videoData).forEach(key => {
+      const value = (videoData as any)[key];
+      if (value !== null && value !== undefined) {
+        formData.append(key, value);
+      }
+    });
+    
+    if (videoFile) {
+      formData.append('videoFile', videoFile);
+    }
+    if (coverImage) {
+      formData.append('coverImage', coverImage);
+    }
+
+    return this.http.put<Video>(`${this.apiUrl}/${id}`, formData, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
   deleteVideo(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, {
       headers: this.authService.getAuthHeaders()

@@ -130,10 +130,12 @@
               <small>Aangemaakt: {{ video.createdAt | date:'short' }}</small>
             </div>
           </div>
-          
-          <div class="video-actions">
+            <div class="video-actions">
             <a [routerLink]="['/video', video.id]" class="btn btn-sm btn-view">
               👁️ Bekijken
+            </a>
+            <a [routerLink]="['/admin/video-edit', video.id]" class="btn btn-sm btn-edit">
+              ✏️ Bewerken
             </a>
             <button class="btn btn-sm btn-delete" (click)="deleteVideo(video.id)">
               🗑️ Verwijderen

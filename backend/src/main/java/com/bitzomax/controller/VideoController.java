@@ -148,6 +148,26 @@ public class VideoController {
         return ResponseEntity.ok(videos);
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateVideo(
+            @PathVariable Long id,
+            @Valid @ModelAttribute VideoRequest videoRequest,
+            @RequestParam(value = "videoFile", required = false) MultipartFile videoFile,
+            @RequestParam(value = "coverImage", required = false) MultipartFile coverImage) {
+        
+        try {
+            Video video = videoService.updateVideo(id, videoRequest, videoFile, coverImage);
+            return ResponseEntity.ok(video);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body("Fout bij updaten van bestanden: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteVideo(@PathVariable Long id) {

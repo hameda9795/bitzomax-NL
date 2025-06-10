@@ -232,6 +232,71 @@ public class VideoService {
         }
     }
 
+    public Video updateVideo(Long videoId, VideoRequest videoRequest, MultipartFile videoFile, 
+                           MultipartFile coverImage) throws IOException {
+        
+        Optional<Video> videoOpt = videoRepository.findById(videoId);
+        if (!videoOpt.isPresent()) {
+            throw new RuntimeException("Video niet gevonden");
+        }
+        
+        Video video = videoOpt.get();
+        
+        // Update video file if provided
+        if (videoFile != null && !videoFile.isEmpty()) {
+            if (!fileStorageService.isValidVideoFile(videoFile)) {
+                throw new IllegalArgumentException("Ongeldig videobestand");
+            }
+            
+            // Delete old video file
+            if (video.getVideoUrl() != null) {
+                fileStorageService.deleteFile(video.getVideoUrl());
+            }
+            
+            // Store new video file
+            String videoPath = fileStorageService.storeFile(videoFile, "videos");
+            video.setVideoUrl(videoPath);
+        }
+        
+        // Update cover image if provided
+        if (coverImage != null && !coverImage.isEmpty()) {
+            if (!fileStorageService.isValidImageFile(coverImage)) {
+                throw new IllegalArgumentException("Ongeldig afbeeldingsbestand");
+            }
+            
+            // Delete old cover image
+            if (video.getCoverImageUrl() != null) {
+                fileStorageService.deleteFile(video.getCoverImageUrl());
+            }
+            
+            // Store new cover image
+            String coverImagePath = fileStorageService.storeFile(coverImage, "covers");
+            video.setCoverImageUrl(coverImagePath);
+        }
+        
+        // Update video metadata
+        video.setTitle(videoRequest.getTitle());
+        video.setDescription(videoRequest.getDescription());
+        video.setPoemText(videoRequest.getPoemText());
+        video.setHashtags(videoRequest.getHashtags());
+        video.setContentType(videoRequest.getContentType());
+        
+        // Update SEO data
+        video.setSeoTitle(videoRequest.getSeoTitle());
+        video.setSeoDescription(videoRequest.getSeoDescription());
+        video.setSeoKeywords(videoRequest.getSeoKeywords());
+        
+        // Update social media links
+        video.setSpotifyLink(videoRequest.getSpotifyLink());
+        video.setAmazonLink(videoRequest.getAmazonLink());
+        video.setAppleMusicLink(videoRequest.getAppleMusicLink());
+        video.setItunesLink(videoRequest.getItunesLink());
+        video.setYoutubeMusicLink(videoRequest.getYoutubeMusicLink());
+        video.setInstagramLink(videoRequest.getInstagramLink());
+
+        return videoRepository.save(video);
+    }
+
     public void deleteVideo(Long videoId) throws IOException {
         Optional<Video> videoOpt = videoRepository.findById(videoId);
         if (videoOpt.isPresent()) {

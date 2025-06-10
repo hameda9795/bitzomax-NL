@@ -28,6 +28,10 @@ export const routes: Routes = [
   },  { 
     path: 'admin/upload', 
     loadComponent: () => import('./components/admin/video-upload/video-upload.component').then(m => m.VideoUploadComponent) 
+  },  { 
+    path: 'admin/video-edit/:id', 
+    loadComponent: () => import('./components/admin/video-edit/video-edit.component').then(m => m.VideoEditComponent),
+    data: { renderMode: 'csr' }
   },
   { 
     path: 'privacy', 
