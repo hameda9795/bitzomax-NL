@@ -33,32 +33,63 @@ const USER_KEY = 'auth-user';
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
-  private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
+  private loggedIn = new BehaviorSubject<boolean>(false);
 
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) {
+    // Initialize authentication state on service creation
+    this.initializeAuthState();
+  }
 
+  private initializeAuthState(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      const hasValidToken = this.hasToken();
+      const hasValidUser = !!this.getUser();
+      
+      // Set initial state based on localStorage content
+      const isAuthenticated = hasValidToken && hasValidUser;
+      this.loggedIn.next(isAuthenticated);
+      
+      // Clear incomplete data if only token or user exists but not both
+      if (hasValidToken && !hasValidUser) {
+        console.warn('Found token but no user data, clearing localStorage');
+        this.clearAuthData();
+      } else if (!hasValidToken && hasValidUser) {
+        console.warn('Found user data but no token, clearing localStorage');
+        this.clearAuthData();
+      }
+    }
+  }
+
+  private clearAuthData(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      window.localStorage.removeItem(TOKEN_KEY);
+      window.localStorage.removeItem(USER_KEY);
+    }
+    this.loggedIn.next(false);
+  }
   login(credentials: LoginRequest): Observable<AuthResponse> {
+    console.log('AuthService.login called with:', credentials);
+    console.log('API URL:', `${this.apiUrl}/signin`);
+    
     return this.http.post<AuthResponse>(`${this.apiUrl}/signin`, credentials)
       .pipe(
         tap(response => {
+          console.log('Login response received:', response);
           this.saveToken(response.accessToken);
           this.saveUser(response);
           this.loggedIn.next(true);
+          console.log('Token and user saved, logged in state updated');
         })
       );
   }
 
   register(userData: SignupRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}/signup`, userData);
-  }
-  logout(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      window.localStorage.clear();
-    }
-    this.loggedIn.next(false);
+  }  logout(): void {
+    this.clearAuthData();
   }
 
   saveToken(token: string): void {
@@ -92,9 +123,10 @@ export class AuthService {
   isLoggedIn(): Observable<boolean> {
     return this.loggedIn.asObservable();
   }
-
   isAuthenticated(): boolean {
-    return this.hasToken();
+    const hasValidToken = this.hasToken();
+    const hasValidUser = !!this.getUser();
+    return hasValidToken && hasValidUser;
   }
 
   getCurrentUser(): any {
@@ -102,14 +134,14 @@ export class AuthService {
   }
 
   hasToken(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    return !!token && token.length > 0;
   }
 
   isAdmin(): boolean {
     const user = this.getUser();
     return user && user.roles && user.roles.includes('ROLE_ADMIN');
   }
-
   getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     if (!token) {
@@ -119,5 +151,23 @@ export class AuthService {
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
+  }
+
+  // Method to manually refresh authentication state (useful for debugging)
+  refreshAuthState(): void {
+    this.initializeAuthState();
+  }
+
+  // Method to check if user has valid session
+  hasValidSession(): boolean {
+    const token = this.getToken();
+    const user = this.getUser();
+    
+    if (!token || !user) {
+      return false;
+    }
+
+    // Additional validation could be added here (e.g., token expiry check)
+    return true;
   }
 }

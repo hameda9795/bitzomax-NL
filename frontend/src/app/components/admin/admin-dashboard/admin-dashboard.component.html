@@ -110,10 +110,9 @@
         <button class="btn btn-primary" (click)="loadVideos()">Opnieuw proberen</button>
       </div>
 
-      <div class="videos-grid" *ngIf="!loading && !error">
-        <div class="video-card" *ngFor="let video of videos">
+      <div class="videos-grid" *ngIf="!loading && !error">        <div class="video-card" *ngFor="let video of videos">
           <div class="video-thumbnail">
-            <img [src]="getVideoThumbnail(video)" [alt]="video.title" />
+            <img [src]="getVideoThumbnail(video)" [alt]="video.title" (error)="onImageError($event)" />
             <div class="content-type-badge" [class.premium]="video.contentType === 'PREMIUM'">
               {{ video.contentType === 'FREE' ? 'Gratis' : 'Premium' }}
             </div>

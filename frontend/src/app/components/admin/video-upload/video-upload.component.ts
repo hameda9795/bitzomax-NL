@@ -65,13 +65,16 @@ export class VideoUploadComponent implements OnInit {
       this.selectedImageFile = input.files[0];
     }
   }  onSubmit(): void {
+    // Refresh authentication state before making request
+    this.authService.refreshAuthState();
+    
     // Debug authentication status
     console.log('=== AUTHENTICATION DEBUG ===');
     console.log('Is authenticated:', this.authService.isAuthenticated());
     console.log('Is admin:', this.authService.isAdmin());
     console.log('Current user:', this.authService.getCurrentUser());
+    console.log('Has valid session:', this.authService.hasValidSession());
     console.log('Token:', this.authService.getToken());
-    console.log('Auth headers:', this.authService.getAuthHeaders());
 
     if (!this.authService.isAuthenticated()) {
       this.errorMessage = 'Je bent niet ingelogd. Log eerst in.';
@@ -81,6 +84,10 @@ export class VideoUploadComponent implements OnInit {
 
     if (!this.authService.isAdmin()) {
       this.errorMessage = 'Je hebt geen admin rechten om videos te uploaden.';
+      // Optionally redirect to login to refresh session
+      setTimeout(() => {
+        this.router.navigate(['/login']);
+      }, 2000);
       return;
     }
 
@@ -103,11 +110,21 @@ export class VideoUploadComponent implements OnInit {
           
           if (error.status === 403) {
             this.errorMessage = 'Toegang geweigerd. Controleer of je ingelogd bent als admin en probeer opnieuw in te loggen.';
+            // Clear potentially corrupted session data
+            this.authService.logout();
+            setTimeout(() => {
+              this.router.navigate(['/login']);
+            }, 2000);
           } else if (error.status === 401) {
             this.errorMessage = 'Je sessie is verlopen. Log opnieuw in.';
+            this.authService.logout();
             this.router.navigate(['/login']);
+          } else if (error.status === 413) {
+            this.errorMessage = 'Het videobestand is te groot. Probeer een kleiner bestand.';
+          } else if (error.status === 0) {
+            this.errorMessage = 'Kan geen verbinding maken met de server. Controleer je internetverbinding.';
           } else {
-            this.errorMessage = `Fout bij het uploaden: ${error.status} - ${error.statusText}`;
+            this.errorMessage = `Fout bij het uploaden: ${error.status} - ${error.statusText || 'Onbekende fout'}`;
           }
           
           this.isLoading = false;

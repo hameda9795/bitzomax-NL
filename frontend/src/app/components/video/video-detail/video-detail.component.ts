@@ -175,6 +175,10 @@ export class VideoDetailComponent implements OnInit, OnDestroy {
     return this.video ? this.videoService.getCoverImageUrl(this.video.coverImageUrl) : '';
   }
 
+  onImageError(event: any): void {
+    event.target.src = 'assets/images/default-thumbnail.svg';
+  }
+
   goBack(): void {
     this.router.navigate(['/home']);
   }

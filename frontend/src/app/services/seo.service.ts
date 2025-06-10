@@ -124,14 +124,13 @@ export class SeoService {
           "interactionType": "https://schema.org/LikeAction",
           "userInteractionCount": video.likeCount
         }
-      ],
-      "publisher": {
+      ],      "publisher": {
         "@type": "Organization",
         "name": "Bitzomax",
-        "url": "http://91.99.49.208"
+        "url": "https://bitzomax.nl"
       },
       "contentUrl": video.videoUrl ? `${environment.uploadsUrl}/${video.videoUrl}` : '',
-      "embedUrl": `http://91.99.49.208/video/${video.id}`,
+      "embedUrl": `https://bitzomax.nl/video/${video.id}`,
       "inLanguage": "nl-NL",
       "isAccessibleForFree": video.contentType === 'FREE',
       "keywords": video.seoKeywords || video.hashtags
@@ -143,14 +142,13 @@ export class SeoService {
     script.textContent = JSON.stringify(videoStructuredData);
     document.head.appendChild(script);
   }
-
   setDefaultMeta(): void {
     this.updateMetaTags({
       title: 'Bitzomax - Nederlandse Video Streaming Platform',
       description: 'Ontdek de beste Nederlandse video content op Bitzomax. Stream gratis en premium video\'s in hoge kwaliteit.',
       keywords: 'nederlandse video, streaming, bitzomax, gratis video, premium content, nederlandse liedjes',
       type: 'website',
-      url: 'http://localhost:4200'
+      url: 'https://bitzomax.nl'
     });
   }
 

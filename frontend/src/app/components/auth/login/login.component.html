@@ -43,6 +43,23 @@
         <span *ngIf="isLoading" class="spinner"></span>
         {{ isLoading ? 'Inloggen...' : 'Inloggen' }}
       </button>
+        <!-- Debug test button -->
+      <button
+        type="button"
+        class="btn btn-secondary w-100"
+        style="margin-top: 10px; background-color: #28a745; border-color: #28a745;"
+        (click)="testLogin()"
+      >
+        🔧 Test Login (Admin Debug)
+      </button>
+      
+      <!-- Debug info -->
+      <div style="margin-top: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; font-size: 12px; color: #6c757d;">
+        <strong>Debug Info:</strong><br>
+        Form Valid: {{ loginForm.valid }}<br>
+        Form Value: {{ loginForm.value | json }}<br>
+        <small>Use the green button above to test API directly</small>
+      </div>
     </form>
 
     <div class="form-footer">

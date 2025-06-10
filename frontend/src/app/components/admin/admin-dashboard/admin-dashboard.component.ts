@@ -127,6 +127,10 @@ export class AdminDashboardComponent implements OnInit {
     return 'assets/images/default-thumbnail.svg';
   }
 
+  onImageError(event: any): void {
+    event.target.src = 'assets/images/default-thumbnail.svg';
+  }
+
   getFreeVideosCount(): number {
     return this.videos.filter(v => v.contentType === 'FREE').length;
   }
@@ -184,24 +188,30 @@ export class AdminDashboardComponent implements OnInit {
       });
     }
   }
-
   onSubmitUser(): void {
     if (this.addUserForm.valid) {
+      // Refresh authentication state before making request
+      this.authService.refreshAuthState();
+      
       // Debug authentication state
       console.log('=== USER CREATION DEBUG ===');
       console.log('Is authenticated:', this.authService.isAuthenticated());
       console.log('Is admin:', this.authService.isAdmin());
       console.log('Current user:', this.authService.getCurrentUser());
+      console.log('Has valid session:', this.authService.hasValidSession());
       console.log('Token:', this.authService.getToken());
-      console.log('Auth headers:', this.authService.getAuthHeaders());
 
       if (!this.authService.isAuthenticated()) {
         alert('Je bent niet ingelogd. Log eerst in.');
+        this.router.navigate(['/login']);
         return;
       }
 
       if (!this.authService.isAdmin()) {
         alert('Je hebt geen admin rechten om gebruikers aan te maken.');
+        // Clear potentially corrupted session data
+        this.authService.logout();
+        this.router.navigate(['/login']);
         return;
       }
 
