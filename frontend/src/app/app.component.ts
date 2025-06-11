@@ -12,20 +12,24 @@ import { Subscription } from 'rxjs';
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'Bitzomax';
-  isLoggedIn = false;
-  isAdmin = false;
+  isLoggedIn: boolean = false;
+  isAdmin: boolean = false;
   private authSubscription?: Subscription;
   private refreshCheckInterval?: any;  constructor(
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
   ) {
+    // Initialize with default values
+    this.isLoggedIn = false;
+    this.isAdmin = false;
+    
     // Initial sync for browser environment
     if (typeof window !== 'undefined') {
       console.log('🚀 AppComponent constructor - Initializing auth state');
       this.emergencyAuthSync();
     }
-  }  ngOnInit() {
+  }ngOnInit() {
     console.log('🚀 AppComponent ngOnInit - Setting up auth state monitoring');
     
     // Immediate auth state sync
@@ -112,6 +116,10 @@ export class AppComponent implements OnInit, OnDestroy {
           this.isAdmin = false;
           this.cdr.detectChanges();
         });
+      } else {
+        // Ensure defaults are set even if no auth data
+        this.isLoggedIn = false;
+        this.isAdmin = false;
       }
     }
   }

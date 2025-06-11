@@ -5,13 +5,12 @@
         <h1>🎬 Bitzomax</h1>
       </a>
     </div>
-    
-    <div class="nav-links">
+      <div class="nav-links">
       <a routerLink="/home" routerLinkActive="active">Home</a>
       
-      @if (isLoggedIn) {
+      @if (isLoggedIn === true) {
         <a routerLink="/profile" routerLinkActive="active">Profiel</a>
-        @if (isAdmin) {
+        @if (isAdmin === true) {
           <a routerLink="/admin" routerLinkActive="active">Admin</a>
         }
         <button class="btn-logout" (click)="logout()">Uitloggen</button>
