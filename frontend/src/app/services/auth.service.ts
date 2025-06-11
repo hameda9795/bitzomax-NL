@@ -522,4 +522,38 @@ export class AuthService {
       setTimeout(() => this.loggedIn.next(isValid), 100);
     }
   }
+
+  // Safe getter methods to prevent null reference errors
+  get safeIsLoggedIn(): boolean {
+    try {
+      const user = this.getUser();
+      return user != null && this.hasToken() && this.loggedIn.value === true;
+    } catch (error) {
+      console.warn('⚠️ Error in safeIsLoggedIn:', error);
+      return false;
+    }
+  }
+
+  get safeIsAdmin(): boolean {
+    try {
+      const user = this.getUser();
+      if (!user || !this.hasToken()) {
+        return false;
+      }
+      return user.roles && Array.isArray(user.roles) && user.roles.includes('ROLE_ADMIN');
+    } catch (error) {
+      console.warn('⚠️ Error in safeIsAdmin:', error);
+      return false;
+    }
+  }
+
+  get safeCurrentUser(): any {
+    try {
+      const user = this.getUser();
+      return user || null;
+    } catch (error) {
+      console.warn('⚠️ Error in safeCurrentUser:', error);
+      return null;
+    }
+  }
 }
