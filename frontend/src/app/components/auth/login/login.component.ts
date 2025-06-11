@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +16,7 @@ export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   isLoading = false;
   errorMessage = '';
+  isProduction = environment.production;
 
   constructor(
     private fb: FormBuilder,
@@ -22,24 +24,35 @@ export class LoginComponent implements OnInit {
     private router: Router
   ) {}  ngOnInit(): void {
     this.loginForm = this.fb.group({
-      username: ['admin', [Validators.required]], // Pre-fill with admin
-      password: ['admin123', [Validators.required, Validators.minLength(6)]] // Pre-fill with admin123
+      username: ['', [Validators.required]], 
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
     
-    // Add a test login method for debugging
-    console.log('Login component initialized');
-    console.log('Form initial state:', {
-      valid: this.loginForm.valid,
-      errors: this.loginForm.errors,
-      value: this.loginForm.value
-    });
-    
-    // Mark form as touched to show any validation errors
-    this.loginForm.markAllAsTouched();
+    // Only add debug functionality in development
+    if (!environment.production) {
+      // Pre-fill with admin credentials for development
+      this.loginForm.patchValue({
+        username: 'admin',
+        password: 'admin123'
+      });
+      
+      console.log('Login component initialized (development mode)');
+      console.log('Form initial state:', {
+        valid: this.loginForm.valid,
+        errors: this.loginForm.errors,
+        value: this.loginForm.value
+      });
+      
+      this.loginForm.markAllAsTouched();
+    }
   }
-
-  // Test method to bypass form validation
+  // Test method to bypass form validation (development only)
   testLogin(): void {
+    if (environment.production) {
+      console.warn('Test login is disabled in production');
+      return;
+    }
+    
     console.log('Test login called');
     const testCredentials = { username: 'admin', password: 'admin123' };
     

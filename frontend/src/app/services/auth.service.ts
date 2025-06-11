@@ -39,24 +39,22 @@ export class AuthService {
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // شروع با false برای جلوگیری از مشکلات SSR
     this.loggedIn = new BehaviorSubject<boolean>(false);
     
-    console.log('🚀 AuthService constructor - Starting with false, will check localStorage...');
+    console.log('🚀 AuthService constructor');
     
-    // فوری localStorage را چک کن اگر browser است
     if (isPlatformBrowser(this.platformId)) {
-      // چک فوری
-      const immediateState = this.getInitialAuthState();
-      console.log('🔍 Immediate state check:', immediateState);
+      // Check initial state immediately
+      const initialState = this.getInitialAuthState();
+      console.log('🔍 Initial auth state:', initialState);
       
-      if (immediateState) {
+      if (initialState) {
         this.loggedIn.next(true);
-        console.log('✅ Found valid auth data, setting to true immediately');
+        console.log('✅ Setting initial state to true');
       }
       
-      // چندین مرحله initialization برای اطمینان
-      this.performMultipleInitializationAttempts();
+      // Initialize properly after a brief delay
+      setTimeout(() => this.initializeAuthState(), 10);
     }
   }
 
