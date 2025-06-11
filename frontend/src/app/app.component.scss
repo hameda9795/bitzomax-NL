@@ -212,6 +212,43 @@
   }
 }
 
+// Additional cursor fix for all navigation links
+.nav-links {
+  a, button {
+    cursor: pointer !important;
+    user-select: none;
+    
+    &:hover {
+      cursor: pointer !important;
+    }
+    
+    &:disabled {
+      cursor: not-allowed !important;
+    }
+  }
+}
+
+// Specific overrides for problematic elements
+a[routerLink] {
+  cursor: pointer !important;
+  
+  &:hover {
+    cursor: pointer !important;
+  }
+}
+
+.login-link {
+  cursor: pointer !important;
+  
+  &:hover {
+    cursor: pointer !important;
+  }
+}
+
+.btn-logout {
+  cursor: pointer !important;
+}
+
 // Main Content Area
 .main-content {
   flex: 1;

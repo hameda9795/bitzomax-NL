@@ -15,22 +15,28 @@ export class AppComponent implements OnInit, OnDestroy {
   isLoggedIn: boolean = false;
   isAdmin: boolean = false;
   private authSubscription?: Subscription;
-  private refreshCheckInterval?: any;  constructor(
+  private refreshCheckInterval?: any;
+
+  constructor(
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
   ) {
     console.log('🚀 AppComponent constructor - Initializing auth state');
     
-    // Always initialize with default values
+    // Ensure properties are always initialized to prevent null errors
     this.isLoggedIn = false;
     this.isAdmin = false;
+    
+    // Bind methods to this context to prevent null reference errors
+    this.logout = this.logout.bind(this);
+    this.emergencyAuthSync = this.emergencyAuthSync.bind(this);
     
     // Initial sync for browser environment with safe guard
     if (typeof window !== 'undefined') {
       try {
         console.log('🚀 Initial auth sync from constructor');
-        this.emergencyAuthSync();
+        setTimeout(() => this.emergencyAuthSync(), 0);
       } catch (error) {
         console.error('❌ Error during initial auth sync:', error);
         // Ensure defaults are set
@@ -206,6 +212,15 @@ export class AppComponent implements OnInit, OnDestroy {
       clearInterval(this.refreshCheckInterval);
     }
   }
+  // Safe getter methods to prevent null reference errors
+  get safeIsLoggedIn(): boolean {
+    return this?.isLoggedIn === true;
+  }
+
+  get safeIsAdmin(): boolean {
+    return this?.isAdmin === true;
+  }
+
   logout() {
     console.log('👋 User logout requested');
     try {

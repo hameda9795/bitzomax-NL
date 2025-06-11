@@ -7,15 +7,15 @@
     </div>      <div class="nav-links">
       <a routerLink="/home" routerLinkActive="active">Home</a>
       
-      @if (isLoggedIn === true) {
+      @if (safeIsLoggedIn) {
         <a routerLink="/profile" routerLinkActive="active">Profiel</a>
-        @if (isAdmin === true) {
+        @if (safeIsAdmin) {
           <a routerLink="/admin" routerLinkActive="active">Admin</a>
         }
-        <button class="btn-logout" (click)="logout()">Uitloggen</button>
+        <button class="btn-logout" (click)="logout()" style="cursor: pointer;">Uitloggen</button>
       } @else {
-        <a routerLink="/login" routerLinkActive="active" class="login-link">Inloggen</a>
-        <a routerLink="/register" routerLinkActive="active">Registreren</a>
+        <a routerLink="/login" routerLinkActive="active" class="login-link" style="cursor: pointer;">Inloggen</a>
+        <a routerLink="/register" routerLinkActive="active" style="cursor: pointer;">Registreren</a>
       }
     </div>
   </nav>
@@ -25,7 +25,8 @@
   </main>
 
   <footer class="footer">
-    <div class="footer-content">      <p>&copy; 2025 Bitzomax - Nederlandse Video Streaming Platform</p>
+    <div class="footer-content">
+      <p>&copy; 2025 Bitzomax - Nederlandse Video Streaming Platform</p>
       <div class="footer-links">
         <a routerLink="/privacy">Privacy</a>
         <a routerLink="/terms">Algemene Voorwaarden</a>
