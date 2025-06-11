@@ -5,19 +5,18 @@
         <h1>🎬 Bitzomax</h1>
       </a>
     </div>
-    
-    <div class="nav-links">
+      <div class="nav-links">
       <a routerLink="/home" routerLinkActive="active">Home</a>
       
-      @if (isLoggedIn) {
+      @if (safeIsLoggedIn) {
         <a routerLink="/profile" routerLinkActive="active">Profiel</a>
-        @if (isAdmin) {
+        @if (safeIsAdmin) {
           <a routerLink="/admin" routerLinkActive="active">Admin</a>
         }
-        <button class="btn-logout" (click)="logout()">Uitloggen</button>
+        <button class="btn-logout" (click)="logout()" style="cursor: pointer;">Uitloggen</button>
       } @else {
-        <a routerLink="/login" routerLinkActive="active">Inloggen</a>
-        <a routerLink="/register" routerLinkActive="active">Registreren</a>
+        <a routerLink="/login" routerLinkActive="active" class="login-link" style="cursor: pointer;">Inloggen</a>
+        <a routerLink="/register" routerLinkActive="active" style="cursor: pointer;">Registreren</a>
       }
     </div>
   </nav>
