@@ -22,7 +22,9 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
-  ) {}  ngOnInit(): void {
+  ) {}
+
+  ngOnInit(): void {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]], 
       password: ['', [Validators.required]]
@@ -46,6 +48,7 @@ export class LoginComponent implements OnInit {
       this.loginForm.markAllAsTouched();
     }
   }
+
   // Test method to bypass form validation (development only)
   testLogin(): void {
     if (environment.production) {
@@ -72,43 +75,39 @@ export class LoginComponent implements OnInit {
       }
     });
   }
+
   onSubmit(): void {
     console.log('Form submitted');
     console.log('Form valid:', this.loginForm.valid);
     console.log('Form value:', this.loginForm.value);
     console.log('Form errors:', this.loginForm.errors);
     
-    if (this.loginForm.valid) {
-      this.isLoading = true;
-      this.errorMessage = '';
-      
-      console.log('Making login request to API...');
-      this.authService.login(this.loginForm.value).subscribe({
-        next: (response) => {
-          console.log('Login successful', response);
-          // Check if user is admin and redirect accordingly
-          if (response.roles && response.roles.includes('ROLE_ADMIN')) {
-            this.router.navigate(['/admin']);
-          } else {
-            this.router.navigate(['/home']);
-          }
-        },
-        error: (error) => {
-          console.error('Login error details:', error);
-          console.error('Error status:', error.status);
-          console.error('Error message:', error.message);
-          this.errorMessage = `Inloggen mislukt: ${error.status ? error.status + ' - ' : ''}${error.error?.message || error.message || 'Controleer je gegevens.'}`;
-          this.isLoading = false;
-        },
-        complete: () => {
-          this.isLoading = false;
+    // Remove validation check - allow any input
+    this.isLoading = true;
+    this.errorMessage = '';
+    
+    console.log('Making login request to API...');
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (response) => {
+        console.log('Login successful', response);
+        // Check if user is admin and redirect accordingly
+        if (response.roles && response.roles.includes('ROLE_ADMIN')) {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/home']);
         }
-      });
-    } else {
-      console.log('Form is invalid');
-      console.log('Username errors:', this.username?.errors);
-      console.log('Password errors:', this.password?.errors);
-    }
+      },
+      error: (error) => {
+        console.error('Login error details:', error);
+        console.error('Error status:', error.status);
+        console.error('Error message:', error.message);
+        this.errorMessage = `Inloggen mislukt: ${error.status ? error.status + ' - ' : ''}${error.error?.message || error.message || 'Controleer je gegevens.'}`;
+        this.isLoading = false;
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
   get username() {
