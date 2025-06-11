@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStorage Persistence Test - Bitzomax</title>
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #6366f1;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: #334155;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #6366f1;
+        }
+        .success { border-left-color: #10b981; }
+        .error { border-left-color: #ef4444; }
+        .warning { border-left-color: #f59e0b; }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #4f46e5;
+        }
+        pre {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .status {
+            font-weight: bold;
+            font-size: 18px;
+            margin: 15px 0;
+        }
+        input {
+            background: #1e293b;
+            border: 1px solid #475569;
+            color: #f8fafc;
+            padding: 10px;
+            border-radius: 6px;
+            width: 200px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 LocalStorage Persistence Test - Bitzomax</h1>
+        
+        <div class="test-section" id="generalStatus">
+            <h3>🏠 General localStorage Status</h3>
+            <div id="localStorageSupport"></div>
+            <div id="cookieStatus"></div>
+            <div id="storageQuota"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔐 Current Authentication State</h3>
+            <div id="currentAuthState"></div>
+            <button onclick="checkCurrentAuth()">Check Current Auth</button>
+            <button onclick="clearAllAuth()">Clear All Auth Data</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 Manual Test</h3>
+            <input type="text" id="testKey" placeholder="Test Key" value="test-key">
+            <input type="text" id="testValue" placeholder="Test Value" value="test-value-123">
+            <button onclick="setTestItem()">Set Item</button>
+            <button onclick="getTestItem()">Get Item</button>
+            <button onclick="removeTestItem()">Remove Item</button>
+            <div id="testResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🚀 Page Refresh Test</h3>
+            <p>This test simulates the authentication persistence issue:</p>
+            <button onclick="simulateLogin()">Simulate Login</button>
+            <button onclick="checkAfterRefresh()">Check After "Refresh"</button>
+            <button onclick="location.reload()">🔄 Actual Page Refresh</button>
+            <div id="refreshTestResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🛠️ Advanced Diagnostics</h3>
+            <button onclick="fullDiagnostic()">Run Full Diagnostic</button>
+            <button onclick="testStorageEvents()">Test Storage Events</button>
+            <div id="diagnosticResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Live Storage Monitor</h3>
+            <button onclick="startMonitoring()">Start Monitoring</button>
+            <button onclick="stopMonitoring()">Stop Monitoring</button>
+            <div id="monitorResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let monitorInterval;
+        let lastKnownStorage = {};
+
+        // Check localStorage support
+        function checkLocalStorageSupport() {
+            try {
+                const test = 'localStorage-test';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        // Initialize page
+        function init() {
+            const supportDiv = document.getElementById('localStorageSupport');
+            const cookieDiv = document.getElementById('cookieStatus');
+            const quotaDiv = document.getElementById('storageQuota');
+
+            if (checkLocalStorageSupport()) {
+                supportDiv.innerHTML = '<span style="color: #10b981;">✅ localStorage is supported</span>';
+            } else {
+                supportDiv.innerHTML = '<span style="color: #ef4444;">❌ localStorage is NOT supported</span>';
+            }
+
+            // Check cookies
+            cookieDiv.innerHTML = `<span style="color: ${navigator.cookieEnabled ? '#10b981' : '#ef4444'};">${navigator.cookieEnabled ? '✅' : '❌'} Cookies are ${navigator.cookieEnabled ? 'enabled' : 'disabled'}</span>`;
+
+            // Check storage quota
+            if ('storage' in navigator && 'estimate' in navigator.storage) {
+                navigator.storage.estimate().then(estimate => {
+                    const used = estimate.usage ? (estimate.usage / 1024 / 1024).toFixed(2) : 'unknown';
+                    const quota = estimate.quota ? (estimate.quota / 1024 / 1024).toFixed(2) : 'unknown';
+                    quotaDiv.innerHTML = `📊 Storage: ${used}MB used / ${quota}MB total`;
+                });
+            } else {
+                quotaDiv.innerHTML = '📊 Storage quota info not available';
+            }
+
+            checkCurrentAuth();
+        }
+
+        function checkCurrentAuth() {
+            const authToken = localStorage.getItem('auth-token');
+            const authUser = localStorage.getItem('auth-user');
+            
+            const resultDiv = document.getElementById('currentAuthState');
+            let html = '<h4>Current Auth Data:</h4>';
+            
+            if (authToken) {
+                html += `<div style="color: #10b981;">✅ auth-token: ${authToken.substring(0, 30)}...</div>`;
+            } else {
+                html += '<div style="color: #ef4444;">❌ No auth-token found</div>';
+            }
+            
+            if (authUser) {
+                html += `<div style="color: #10b981;">✅ auth-user: ${authUser.substring(0, 50)}...</div>`;
+            } else {
+                html += '<div style="color: #ef4444;">❌ No auth-user found</div>';
+            }
+
+            html += `<div style="margin-top: 10px;"><strong>Authentication Status: ${authToken && authUser ? '🟢 LOGGED IN' : '🔴 NOT LOGGED IN'}</strong></div>`;
+            
+            resultDiv.innerHTML = html;
+        }
+
+        function clearAllAuth() {
+            localStorage.removeItem('auth-token');
+            localStorage.removeItem('auth-user');
+            document.getElementById('currentAuthState').innerHTML = '<div style="color: #f59e0b;">🧹 All auth data cleared</div>';
+            setTimeout(checkCurrentAuth, 500);
+        }
+
+        function setTestItem() {
+            const key = document.getElementById('testKey').value;
+            const value = document.getElementById('testValue').value;
+            
+            try {
+                localStorage.setItem(key, value);
+                document.getElementById('testResult').innerHTML = `<div style="color: #10b981;">✅ Set ${key} = ${value}</div>`;
+            } catch(e) {
+                document.getElementById('testResult').innerHTML = `<div style="color: #ef4444;">❌ Error setting: ${e.message}</div>`;
+            }
+        }
+
+        function getTestItem() {
+            const key = document.getElementById('testKey').value;
+            const value = localStorage.getItem(key);
+            
+            if (value !== null) {
+                document.getElementById('testResult').innerHTML = `<div style="color: #10b981;">✅ ${key} = ${value}</div>`;
+            } else {
+                document.getElementById('testResult').innerHTML = `<div style="color: #ef4444;">❌ ${key} not found</div>`;
+            }
+        }
+
+        function removeTestItem() {
+            const key = document.getElementById('testKey').value;
+            localStorage.removeItem(key);
+            document.getElementById('testResult').innerHTML = `<div style="color: #f59e0b;">🗑️ Removed ${key}</div>`;
+        }
+
+        function simulateLogin() {
+            const fakeToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' + btoa(JSON.stringify({
+                sub: "testuser",
+                iat: Date.now() / 1000,
+                exp: (Date.now() / 1000) + 3600
+            }));
+            
+            const fakeUser = JSON.stringify({
+                id: 123,
+                username: "testuser",
+                email: "test@bitzomax.nl",
+                roles: ["USER"]
+            });
+
+            localStorage.setItem('auth-token', fakeToken);
+            localStorage.setItem('auth-user', fakeUser);
+            
+            document.getElementById('refreshTestResult').innerHTML = '<div style="color: #10b981;">✅ Fake login data set! Now try refreshing the page...</div>';
+        }
+
+        function checkAfterRefresh() {
+            checkCurrentAuth();
+            const authToken = localStorage.getItem('auth-token');
+            const authUser = localStorage.getItem('auth-user');
+            
+            let resultHtml = '<h4>After "Refresh" Check:</h4>';
+            if (authToken && authUser) {
+                resultHtml += '<div style="color: #10b981;">✅ Auth data persisted correctly!</div>';
+            } else {
+                resultHtml += '<div style="color: #ef4444;">❌ Auth data was lost!</div>';
+            }
+            
+            document.getElementById('refreshTestResult').innerHTML = resultHtml;
+        }
+
+        function fullDiagnostic() {
+            let diagnostics = [];
+            
+            // Test 1: Basic localStorage
+            try {
+                localStorage.setItem('diag-test', 'success');
+                const retrieved = localStorage.getItem('diag-test');
+                diagnostics.push(`✅ Basic localStorage: ${retrieved === 'success' ? 'WORKING' : 'FAILED'}`);
+                localStorage.removeItem('diag-test');
+            } catch(e) {
+                diagnostics.push(`❌ Basic localStorage: ERROR - ${e.message}`);
+            }
+
+            // Test 2: Large data storage
+            try {
+                const largeData = 'x'.repeat(10000);
+                localStorage.setItem('diag-large', largeData);
+                const retrieved = localStorage.getItem('diag-large');
+                diagnostics.push(`✅ Large data storage: ${retrieved.length === 10000 ? 'WORKING' : 'FAILED'}`);
+                localStorage.removeItem('diag-large');
+            } catch(e) {
+                diagnostics.push(`❌ Large data storage: ERROR - ${e.message}`);
+            }
+
+            // Test 3: JSON storage
+            try {
+                const testObj = { test: true, number: 123, array: [1, 2, 3] };
+                localStorage.setItem('diag-json', JSON.stringify(testObj));
+                const retrieved = JSON.parse(localStorage.getItem('diag-json'));
+                diagnostics.push(`✅ JSON storage: ${retrieved.test && retrieved.number === 123 ? 'WORKING' : 'FAILED'}`);
+                localStorage.removeItem('diag-json');
+            } catch(e) {
+                diagnostics.push(`❌ JSON storage: ERROR - ${e.message}`);
+            }
+
+            // Test 4: Browser compatibility
+            diagnostics.push(`📱 User Agent: ${navigator.userAgent}`);
+            diagnostics.push(`🌐 Browser: ${getBrowserInfo()}`);
+            diagnostics.push(`🔒 Secure Context: ${window.isSecureContext ? 'YES' : 'NO'}`);
+            diagnostics.push(`🍪 Third-party cookies: ${document.cookie ? 'ACCESSIBLE' : 'BLOCKED/NONE'}`);
+
+            document.getElementById('diagnosticResult').innerHTML = 
+                '<pre>' + diagnostics.join('\n') + '</pre>';
+        }
+
+        function getBrowserInfo() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Chrome')) return 'Chrome';
+            if (ua.includes('Firefox')) return 'Firefox';
+            if (ua.includes('Safari')) return 'Safari';
+            if (ua.includes('Edge')) return 'Edge';
+            return 'Unknown';
+        }
+
+        function testStorageEvents() {
+            let eventResults = [];
+            
+            function storageEventHandler(e) {
+                eventResults.push(`Storage event: ${e.key} = ${e.newValue}`);
+                updateEventDisplay();
+            }
+
+            window.addEventListener('storage', storageEventHandler);
+            
+            eventResults.push('🎧 Storage event listener attached');
+            eventResults.push('💡 Open this page in another tab and modify localStorage to see events');
+            
+            // Test storage event in same tab (might not work in all browsers)
+            setTimeout(() => {
+                localStorage.setItem('event-test', 'test-value');
+                eventResults.push('📤 Set event-test in localStorage');
+                updateEventDisplay();
+            }, 1000);
+
+            function updateEventDisplay() {
+                document.getElementById('diagnosticResult').innerHTML = 
+                    '<pre>' + eventResults.join('\n') + '</pre>';
+            }
+            
+            updateEventDisplay();
+        }
+
+        function startMonitoring() {
+            if (monitorInterval) clearInterval(monitorInterval);
+            
+            lastKnownStorage = { ...localStorage };
+            
+            monitorInterval = setInterval(() => {
+                const currentStorage = { ...localStorage };
+                const changes = [];
+                
+                // Check for additions/changes
+                for (let key in currentStorage) {
+                    if (lastKnownStorage[key] !== currentStorage[key]) {
+                        changes.push(`🔄 ${key}: ${lastKnownStorage[key] ? 'CHANGED' : 'ADDED'}`);
+                    }
+                }
+                
+                // Check for deletions
+                for (let key in lastKnownStorage) {
+                    if (!(key in currentStorage)) {
+                        changes.push(`🗑️ ${key}: DELETED`);
+                    }
+                }
+                
+                if (changes.length > 0) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    document.getElementById('monitorResult').innerHTML += 
+                        `<div>[${timestamp}] ${changes.join(', ')}</div>`;
+                }
+                
+                lastKnownStorage = { ...currentStorage };
+            }, 1000);
+            
+            document.getElementById('monitorResult').innerHTML = '<div style="color: #10b981;">📊 Monitoring started...</div>';
+        }
+
+        function stopMonitoring() {
+            if (monitorInterval) {
+                clearInterval(monitorInterval);
+                monitorInterval = null;
+            }
+            document.getElementById('monitorResult').innerHTML += '<div style="color: #f59e0b;">⏹️ Monitoring stopped</div>';
+        }
+
+        // Initialize when page loads
+        init();
+
+        // Handle page visibility to detect refresh/navigation
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                console.log('🔍 Page became visible - checking auth state');
+                checkCurrentAuth();
+            }
+        });
+
+        // Handle beforeunload to see if storage persists
+        window.addEventListener('beforeunload', () => {
+            console.log('🔄 Page is about to unload - current storage:', {
+                'auth-token': localStorage.getItem('auth-token') ? 'present' : 'missing',
+                'auth-user': localStorage.getItem('auth-user') ? 'present' : 'missing'
+            });
+        });
+    </script>
+</body>
+</html>

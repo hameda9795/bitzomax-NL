@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Authentication Persistence</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover { background-color: #0056b3; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Test Authentication Persistence</h1>
+    
+    <div class="test-section">
+        <h2>Test Steps for Page Refresh Issue</h2>
+        <ol>
+            <li>Go to <a href="http://localhost:4200" target="_blank">http://localhost:4200</a></li>
+            <li>Open browser DevTools (F12) and go to Console tab</li>
+            <li>Login with admin credentials: <code>admin / admin123</code></li>
+            <li>Check console for authentication messages</li>
+            <li>Check localStorage for auth data</li>
+            <li><strong>Refresh the page (F5)</strong></li>
+            <li>Check if you remain logged in</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>Debug Tools</h2>
+        <button class="button" onclick="checkLocalStorage()">Check LocalStorage</button>
+        <button class="button" onclick="simulateLogin()">Simulate Login Data</button>
+        <button class="button" onclick="clearStorage()">Clear Storage</button>
+        <button class="button" onclick="testRefresh()">Test Refresh Scenario</button>
+        
+        <div id="results" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Console Output After Refresh</h2>
+        <pre>
+=== initializeAuthState called ===
+Getting initial auth state: {token: true, user: true, hasInitialAuth: true}
+APP_INITIALIZER: Initializing authentication state
+Refreshing authentication state
+Initializing auth state: {hasValidToken: true, hasValidUser: true, tokenValue: 'exists', userValue: 'exists'}
+✅ User is authenticated, setting loggedIn to true
+=== initializeAuthState completed ===
+APP_INITIALIZER: Authentication initialization complete
+AppComponent ngOnInit - Subscribing to auth state
+Auth state changed: true
+User is logged in, isAdmin: true
+        </pre>
+    </div>
+
+    <script>
+        function checkLocalStorage() {
+            const results = document.getElementById('results');
+            const token = localStorage.getItem('auth-token');
+            const user = localStorage.getItem('auth-user');
+            
+            let html = '<h3>LocalStorage Contents:</h3>';
+            
+            if (token) {
+                html += '<p class="success">✅ auth-token: ' + token.substring(0, 50) + '...</p>';
+            } else {
+                html += '<p class="error">❌ auth-token: Not found</p>';
+            }
+            
+            if (user) {
+                try {
+                    const userData = JSON.parse(user);
+                    html += '<p class="success">✅ auth-user: ' + JSON.stringify(userData, null, 2) + '</p>';
+                } catch (e) {
+                    html += '<p class="error">❌ auth-user: Invalid JSON</p>';
+                }
+            } else {
+                html += '<p class="error">❌ auth-user: Not found</p>';
+            }
+            
+            results.innerHTML = html;
+        }
+
+        function simulateLogin() {
+            // Simulate a successful login by setting localStorage
+            const fakeToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTczMzg1NDgwMCwiZXhwIjoxNzMzOTQxMjAwfQ.fake_signature";
+            const fakeUser = {
+                id: 1,
+                username: "admin",
+                email: "admin@bitzomax.com",
+                roles: ["ROLE_ADMIN"]
+            };
+            
+            localStorage.setItem('auth-token', fakeToken);
+            localStorage.setItem('auth-user', JSON.stringify(fakeUser));
+            
+            document.getElementById('results').innerHTML = 
+                '<p class="success">✅ Fake login data added to localStorage!</p>' +
+                '<p class="info">Now refresh the page to test persistence.</p>';
+        }
+
+        function clearStorage() {
+            localStorage.removeItem('auth-token');
+            localStorage.removeItem('auth-user');
+            document.getElementById('results').innerHTML = 
+                '<p class="info">🗑️ LocalStorage cleared!</p>';
+        }
+
+        function testRefresh() {
+            // First set fake data, then refresh
+            simulateLogin();
+            setTimeout(() => {
+                if (confirm('Ready to test page refresh? This will reload the page.')) {
+                    location.reload();
+                }
+            }, 1000);
+        }
+
+        // Auto-check localStorage on page load
+        window.onload = function() {
+            checkLocalStorage();
+        };
+    </script>
+</body>
+</html>

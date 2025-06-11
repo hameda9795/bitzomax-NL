@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Bitzomax Authentication Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Instructions</h2>
+        <ol>
+            <li>Open the Bitzomax application at <a href="http://localhost:4200" target="_blank">http://localhost:4200</a></li>
+            <li>Login with your credentials (admin or regular user)</li>
+            <li>Verify that you can access authenticated pages</li>
+            <li>Refresh the page (F5 or Ctrl+R)</li>
+            <li>Check if you are still logged in (should NOT require login again)</li>
+            <li>Check browser console for authentication debug logs</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Behavior After Fix</h2>
+        <div class="status success">
+            <strong>✓ Authentication State Persistence:</strong> User should remain logged in after page refresh
+        </div>
+        <div class="status success">
+            <strong>✓ Console Logs:</strong> Should see authentication initialization messages in browser console
+        </div>
+        <div class="status success">
+            <strong>✓ Admin Features:</strong> Admin users should retain admin privileges after refresh
+        </div>
+        <div class="status success">
+            <strong>✓ Navigation:</strong> Authenticated users should have access to their dashboard and profile
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Key Changes Made</h2>
+        <ul>
+            <li><strong>Enhanced AuthService initialization:</strong> Added better logging and state management</li>
+            <li><strong>APP_INITIALIZER:</strong> Ensures authentication state is properly set before app starts</li>
+            <li><strong>Improved app.component.ts:</strong> Better handling of authentication state changes</li>
+            <li><strong>Debug logging:</strong> Added console logs to track authentication flow</li>
+            <li><strong>State synchronization:</strong> Added methods to check and refresh authentication state</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>Troubleshooting</h2>
+        <div class="status info">
+            <strong>If still having issues:</strong>
+            <ul>
+                <li>Check browser console for error messages</li>
+                <li>Verify localStorage contains 'auth-token' and 'auth-user' after login</li>
+                <li>Ensure backend is running and accessible</li>
+                <li>Clear browser cache and localStorage if needed</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Quick Actions</h2>
+        <button onclick="openApp()">Open Bitzomax App</button>
+        <button onclick="checkLocalStorage()">Check LocalStorage</button>
+        <button onclick="clearStorage()">Clear Storage</button>
+    </div>
+
+    <div id="results" class="test-section" style="display: none;">
+        <h3>LocalStorage Contents:</h3>
+        <pre id="storage-content"></pre>
+    </div>
+
+    <script>
+        function openApp() {
+            window.open('http://localhost:4200', '_blank');
+        }
+
+        function checkLocalStorage() {
+            const results = document.getElementById('results');
+            const content = document.getElementById('storage-content');
+            
+            const token = localStorage.getItem('auth-token');
+            const user = localStorage.getItem('auth-user');
+            
+            const storageInfo = {
+                'auth-token': token ? `${token.substring(0, 20)}...` : 'Not found',
+                'auth-user': user ? JSON.parse(user) : 'Not found',
+                'localStorage_length': localStorage.length
+            };
+            
+            content.textContent = JSON.stringify(storageInfo, null, 2);
+            results.style.display = 'block';
+        }
+
+        function clearStorage() {
+            if (confirm('Are you sure you want to clear authentication data?')) {
+                localStorage.removeItem('auth-token');
+                localStorage.removeItem('auth-user');
+                alert('Authentication data cleared. You may need to refresh the Bitzomax app.');
+            }
+        }
+    </script>
+</body>
+</html>
