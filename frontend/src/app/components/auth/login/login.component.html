@@ -26,10 +26,8 @@
           class="form-control"
           [class.is-invalid]="password?.invalid && password?.touched"
           placeholder="Voer je wachtwoord in"
-        />
-        <div class="invalid-feedback" *ngIf="password?.invalid && password?.touched">
+        />        <div class="invalid-feedback" *ngIf="password?.invalid && password?.touched">
           <div *ngIf="password?.errors?.['required']">Wachtwoord is verplicht</div>
-          <div *ngIf="password?.errors?.['minlength']">Wachtwoord moet minimaal 6 tekens bevatten</div>
         </div>
       </div>
 
