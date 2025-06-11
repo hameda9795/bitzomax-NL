@@ -149,6 +149,31 @@
       }
     }
     
+    // Login link specific styling
+    .login-link {
+      cursor: pointer !important;
+      position: relative;
+      
+      &:hover {
+        color: var(--primary-color);
+      }
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--primary-color);
+        transition: width var(--transition-normal);
+      }
+      
+      &:hover::after {
+        width: 100%;
+      }
+    }
+    
     .btn-logout {
       background: transparent;
       color: var(--error-color);

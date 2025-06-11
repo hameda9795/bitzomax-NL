@@ -4,8 +4,7 @@
       <a routerLink="/home" class="brand-link">
         <h1>🎬 Bitzomax</h1>
       </a>
-    </div>
-      <div class="nav-links">
+    </div>      <div class="nav-links">
       <a routerLink="/home" routerLinkActive="active">Home</a>
       
       @if (isLoggedIn === true) {
@@ -15,7 +14,7 @@
         }
         <button class="btn-logout" (click)="logout()">Uitloggen</button>
       } @else {
-        <a routerLink="/login" routerLinkActive="active">Inloggen</a>
+        <a routerLink="/login" routerLinkActive="active" class="login-link">Inloggen</a>
         <a routerLink="/register" routerLinkActive="active">Registreren</a>
       }
     </div>

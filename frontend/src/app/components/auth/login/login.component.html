@@ -37,6 +37,7 @@
         type="submit"
         class="btn btn-primary w-100"
         [disabled]="isLoading"
+        style="cursor: pointer;"
       >
         <span *ngIf="isLoading" class="spinner"></span>
         {{ isLoading ? 'Inloggen...' : 'Inloggen' }}
