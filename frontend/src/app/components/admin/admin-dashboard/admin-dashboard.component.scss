@@ -973,17 +973,24 @@
         filter: brightness(1.1);
       }
     }
-    
-    &.btn-edit {
-      background: rgba(251, 191, 36, 0.1);
+      &.btn-edit {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
       color: #fbbf24;
-      border: 1px solid rgba(251, 191, 36, 0.2);
+      border: 1px solid rgba(251, 191, 36, 0.3);
       text-decoration: none;
+      box-shadow: 
+        0 4px 12px rgba(251, 191, 36, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
       &:hover {
-        background: rgba(251, 191, 36, 0.2);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(251, 191, 36, 0.2);
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.25) 0%, rgba(245, 158, 11, 0.2) 100%);
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 
+          0 8px 20px rgba(251, 191, 36, 0.3),
+          0 0 15px rgba(251, 191, 36, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        color: #f59e0b;
+        filter: brightness(1.1);
       }
     }
     
