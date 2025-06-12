@@ -1,7 +1,7 @@
+# Robots.txt voor Bitzomax - Nederlandse Video Streaming Platform
+
 User-agent: *
 Allow: /
-
-# Allow important pages
 Allow: /home
 Allow: /video/*
 Allow: /register
@@ -10,12 +10,76 @@ Allow: /contact
 Allow: /privacy
 Allow: /terms
 
-# Disallow admin areas
+# Disallow admin and private areas
 Disallow: /admin
 Disallow: /admin/*
+Disallow: /profile
+Disallow: /profile/*
 
 # Disallow API endpoints
 Disallow: /api/
 
+# Allow search engines to index cover images but not videos
+Allow: /uploads/covers/*
+Disallow: /uploads/videos/*
+Disallow: /uploads/audios/*
+
+# Allow important static files
+Allow: /assets/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.webp
+
+# Crawl delay to be respectful to server resources
+Crawl-delay: 1
+
 # Sitemap location
 Sitemap: https://bitzomax.nl/sitemap.xml
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 2
+
+# Block AI training scrapers if desired
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+# Block other common bots that might waste resources
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /

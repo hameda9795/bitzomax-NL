@@ -8,6 +8,28 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class SeoService {
+  private readonly dutchKeywords = [
+    'Nederlandse video streaming',
+    'Nederlandse films',
+    'Nederlandse series',
+    'Nederlandse documentaires',
+    'Nederlandse muziekvideos',
+    'Nederlandse content',
+    'Nederlandse entertainment',
+    'gratis Nederlandse videos',
+    'premium Nederlandse content',
+    'streaming platform Nederland',
+    'online video kijken',
+    'Nederlandse video platform',
+    'Bitzomax Nederland',
+    'Nederlandse video website',
+    'streaming service Nederland',
+    'Nederlandse online videos',
+    'video on demand Nederland',
+    'Nederlandse media streaming',
+    'Dutch video streaming',
+    'Dutch content platform'
+  ];
 
   constructor(
     private meta: Meta,

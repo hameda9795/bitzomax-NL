@@ -9,6 +9,8 @@ import { VideoService } from '../../services/video.service';
 import { AuthService } from '../../services/auth.service';
 import { SeoService } from '../../services/seo.service';
 import { PerformanceService } from '../../services/performance.service';
+import { GoogleAnalyticsService } from '../../services/google-analytics.service';
+import { SchemaMarkupService } from '../../services/schema-markup.service';
 import { LazyLoadImageDirective } from '../../directives/lazy-load-image.directive';
 import { RegistrationPromptComponent } from '../auth/registration-prompt/registration-prompt.component';
 
@@ -47,34 +49,36 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     public authService: AuthService,
     private seoService: SeoService,
     private performanceService: PerformanceService,
+    private googleAnalytics: GoogleAnalyticsService,
+    private schemaMarkupService: SchemaMarkupService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-  }
-  ngOnInit(): void {
-    // Set SEO for home page
+  }ngOnInit(): void {
+    // Set comprehensive SEO for home page
     this.seoService.setPageMeta(
       'Nederlandse Video Streaming Platform', 
-      'Ontdek een uitgebreide collectie van Nederlandse video content. Bekijk gratis en premium content op het beste streaming platform van Nederland.',
-      'video streaming, Nederlandse content, entertainment, Bitzomax, gratis videos, premium content'
+      'Ontdek de beste Nederlandse video content op Bitzomax. Stream gratis en premium Nederlandse films, series, muziekvideos en documentaires in hoge kwaliteit. De #1 Nederlandse streaming service met uitgebreide collectie Nederlandse entertainment.',
+      'Nederlandse video streaming, Nederlandse films, Nederlandse series, Nederlandse documentaires, Nederlandse muziekvideos, Nederlandse content, streaming platform Nederland, online video kijken, Nederlandse video platform, Bitzomax Nederland, gratis Nederlandse videos, premium Nederlandse content, streaming service Nederland, Nederlandse online videos, video on demand Nederland, Nederlandse media streaming, Dutch video streaming, Dutch content platform'
     );
     
     this.loadVideos();
   }
-
   ngAfterViewInit(): void {
     // Only run performance optimizations in browser
     if (this.isBrowser) {
       // Initialize performance optimizations after view is initialized
       this.performanceService.addResourceHints();
       this.performanceService.optimizeImageLoading();
+      
+      // Initialize comprehensive schema markup
+      this.schemaMarkupService.initializeBasicSchemas();
     }
   }
 
   ngOnDestroy(): void {
     // Cleanup if needed
   }
-
   loadVideos(): void {
     this.loading = true;
     this.error = '';
@@ -87,6 +91,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           return true;
         });
         this.loading = false;
+        
+        // Add collection page schema markup after videos are loaded
+        if (this.isBrowser && this.videos.length > 0) {
+          const categoryLabel = this.selectedCategory === 'all' ? undefined : this.selectedCategory;
+          this.schemaMarkupService.addCollectionPageSchema(this.videos, categoryLabel);
+        }
       },
       error: (err: any) => {
         this.error = 'Fout bij het laden van video\'s';
@@ -151,7 +161,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   isVideoLoading(videoId: number): boolean {
     return this.loadingVideoId === videoId;
   }
-
   onVideoPlay(video: any): void {
     // Only increment view count once per video session
     if (this.viewIncrementedVideos.has(video.id)) {
@@ -159,6 +168,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     
     this.viewIncrementedVideos.add(video.id);
+    
+    // Track video play in Google Analytics
+    this.googleAnalytics.trackVideoPlay(video.id, video.title, video.contentType);
     
     // Increment view count when video actually starts playing
     this.videoService.incrementView(video.id).subscribe({
@@ -206,7 +218,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return !!(video.spotifyLink || video.amazonLink || video.appleMusicLink || 
               video.itunesLink || video.youtubeMusicLink || video.instagramLink);
   }
-
   toggleLike(video: any): void {
     if (!this.authService.isAuthenticated()) {
       return;
@@ -218,6 +229,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         if (index !== -1) {
           this.videos[index].likeCount = updatedVideo.likeCount;
           this.videos[index].isLiked = updatedVideo.isLiked;
+          
+          // Track like action in Google Analytics
+          if (updatedVideo.isLiked) {
+            this.googleAnalytics.trackVideoLike(video.id, video.title);
+          }
         }
       },
       error: (error) => {
@@ -238,6 +254,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           this.videos[index].isFavorited = updatedVideo.isFavorited;
           if (updatedVideo.favoriteCount !== undefined) {
             this.videos[index].favoriteCount = updatedVideo.favoriteCount;
+          }
+          
+          // Track add to wishlist in Google Analytics
+          if (updatedVideo.isFavorited) {
+            this.googleAnalytics.trackAddToWishlist(video.id, video.title);
           }
         }
       },

@@ -1,0 +1,83 @@
+{
+  "name": "Bitzomax - Nederlandse Video Streaming Platform",
+  "short_name": "Bitzomax",
+  "description": "De #1 Nederlandse video streaming platform met gratis en premium content",
+  "theme_color": "#1976d2",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "lang": "nl",
+  "dir": "ltr",
+  "orientation": "portrait-primary",
+  "categories": ["entertainment", "video", "streaming"],
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/images/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/assets/images/screenshot-narrow.png",
+      "sizes": "640x1136",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Gratis Videos",
+      "short_name": "Gratis",
+      "description": "Bekijk gratis Nederlandse video content",
+      "url": "/category/free",
+      "icons": [
+        {
+          "src": "/assets/icons/free-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Premium Videos",
+      "short_name": "Premium",
+      "description": "Bekijk premium Nederlandse video content",
+      "url": "/category/premium",
+      "icons": [
+        {
+          "src": "/assets/icons/premium-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
