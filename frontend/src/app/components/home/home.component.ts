@@ -134,15 +134,18 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       // Set loading state
       this.loadingVideoId = video.id;
       
-      // Simulate video loading with a timeout (remove in production)
-      setTimeout(() => {
-        if (this.loadingVideoId === video.id) {
-          this.playingVideoId = video.id;
-          this.loadingVideoId = null;
-          // Note: View increment is now handled when video actually starts playing
-        }
-      }, 1000);
+      // Load video immediately (no timeout needed)
+      this.playingVideoId = video.id;
+      this.loadingVideoId = null;
     }
+  }
+
+  onVideoLoadStart(videoId: number): void {
+    this.loadingVideoId = videoId;
+  }
+
+  onVideoCanPlay(videoId: number): void {
+    this.loadingVideoId = null;
   }
 
   isVideoLoading(videoId: number): boolean {

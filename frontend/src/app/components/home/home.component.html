@@ -1,7 +1,7 @@
 <div class="home-container">  <!-- Banner Image -->
   <div class="banner-section">
     <img 
-      [appLazyLoadImage]="'banner.png'" 
+      src="banner.png" 
       alt="Nederlandse Liedjes" 
       class="banner-image"
       width="1200"
@@ -45,8 +45,7 @@
   <div *ngIf="!loading && !error" class="videos-section">
     <div class="videos-grid">      <div *ngFor="let video of videos" class="video-card" (click)="playVideo(video)">
         <!-- Video Thumbnail with 9:16 Aspect Ratio -->
-        <div class="video-thumbnail">
-          <!-- Video Player (Hidden by default) -->          
+        <div class="video-thumbnail">          <!-- Video Player (Only loads when clicked) -->          
           <video 
             #videoPlayer
             *ngIf="playingVideoId === video.id && canWatchVideo(video)"
@@ -54,11 +53,13 @@
             class="video-player"
             controls
             autoplay
-            preload="metadata"
+            preload="none"
             [style.aspect-ratio]="'9/16'"
             (click)="$event.stopPropagation()"
             (play)="onVideoPlay(video)"
-            (ended)="stopVideo()">
+            (ended)="stopVideo()"
+            (loadstart)="onVideoLoadStart(video.id)"
+            (canplay)="onVideoCanPlay(video.id)">
           </video>
           
           <!-- Loading Spinner -->
@@ -66,17 +67,16 @@
             <div class="loading-spinner"></div>
             <span>Video laden...</span>
           </div>
-          
-          <!-- Cover Image -->
+            <!-- Cover Image -->
           <img 
             *ngIf="playingVideoId !== video.id && !isVideoLoading(video.id)"
-            [appLazyLoadImage]="getVideoThumbnail(video)" 
+            [src]="getVideoThumbnail(video)" 
             [alt]="video.title"
             class="cover-image"
             [style.aspect-ratio]="'9/16'"
             width="300"
             height="533"
-            loading="lazy"
+            loading="eager"
             decoding="async"
             (error)="onImageError($event)">
           
