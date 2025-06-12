@@ -21,6 +21,7 @@ export class VideoDetailComponent implements OnInit, OnDestroy {
   canWatch = false;
   hasViewBeenIncremented = false;
   showRegistrationPrompt = false;
+  videoLoading = true; // Added: track if video is loading
     constructor(
     private route: ActivatedRoute,
     public router: Router,
@@ -185,5 +186,13 @@ export class VideoDetailComponent implements OnInit, OnDestroy {
 
   closeRegistrationPrompt(): void {
     this.showRegistrationPrompt = false;
+  }
+
+  onVideoLoadStart(): void {
+    this.videoLoading = true;
+  }
+
+  onVideoCanPlay(): void {
+    this.videoLoading = false;
   }
 }

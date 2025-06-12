@@ -43,11 +43,11 @@
   </div>
   <!-- Videos Grid -->
   <div *ngIf="!loading && !error" class="videos-section">
-    <div class="videos-grid">
-      <div *ngFor="let video of videos" class="video-card" (click)="playVideo(video)">
+    <div class="videos-grid">      <div *ngFor="let video of videos" class="video-card" (click)="playVideo(video)">
         <!-- Video Thumbnail with 9:16 Aspect Ratio -->
         <div class="video-thumbnail">
-          <!-- Video Player (Hidden by default) -->          <video 
+          <!-- Video Player (Hidden by default) -->          
+          <video 
             #videoPlayer
             *ngIf="playingVideoId === video.id && canWatchVideo(video)"
             [src]="getVideoUrl(video.videoUrl)" 
@@ -60,9 +60,16 @@
             (play)="onVideoPlay(video)"
             (ended)="stopVideo()">
           </video>
-            <!-- Cover Image -->
+          
+          <!-- Loading Spinner -->
+          <div *ngIf="isVideoLoading(video.id)" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <span>Video laden...</span>
+          </div>
+          
+          <!-- Cover Image -->
           <img 
-            *ngIf="playingVideoId !== video.id"
+            *ngIf="playingVideoId !== video.id && !isVideoLoading(video.id)"
             [appLazyLoadImage]="getVideoThumbnail(video)" 
             [alt]="video.title"
             class="cover-image"
@@ -74,7 +81,7 @@
             (error)="onImageError($event)">
           
           <!-- Play Button Overlay -->
-          <div *ngIf="playingVideoId !== video.id" class="play-overlay">
+          <div *ngIf="playingVideoId !== video.id && !isVideoLoading(video.id)" class="play-overlay">
             <div class="play-button">
               <mat-icon>{{ canWatchVideo(video) ? 'play_arrow' : 'lock' }}</mat-icon>
             </div>

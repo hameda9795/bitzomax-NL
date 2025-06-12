@@ -36,6 +36,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   playingVideoId: number | null = null;
   viewIncrementedVideos: Set<number> = new Set(); // Track which videos have had their view count incremented
   showRegistrationPrompt = false;
+  loadingVideoId: number | null = null; // Track which video is currently loading
   private isBrowser: boolean;
   categories = [
     { value: 'all', label: 'Alle video\'s' },
@@ -129,10 +130,25 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.stopVideo();
     } else {
       this.stopVideo(); // Stop any currently playing video
-      this.playingVideoId = video.id;
-      // Note: View increment is now handled when video actually starts playing
+      
+      // Set loading state
+      this.loadingVideoId = video.id;
+      
+      // Simulate video loading with a timeout (remove in production)
+      setTimeout(() => {
+        if (this.loadingVideoId === video.id) {
+          this.playingVideoId = video.id;
+          this.loadingVideoId = null;
+          // Note: View increment is now handled when video actually starts playing
+        }
+      }, 1000);
     }
   }
+
+  isVideoLoading(videoId: number): boolean {
+    return this.loadingVideoId === videoId;
+  }
+
   onVideoPlay(video: any): void {
     // Only increment view count once per video session
     if (this.viewIncrementedVideos.has(video.id)) {

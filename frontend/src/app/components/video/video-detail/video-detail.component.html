@@ -5,18 +5,27 @@
     </button>
   </div>
 
-  <div class="video-content">
-    <div class="video-player-section">      <div class="video-wrapper" *ngIf="canWatch">
+  <div class="video-content">    <div class="video-player-section">      
+      <div class="video-wrapper" *ngIf="canWatch">
+        <!-- Loading indicator for video -->
+        <div *ngIf="videoLoading" class="video-loading">
+          <div class="spinner"></div>
+          <p>Video laden...</p>
+        </div>
+        
+        <!-- Video player, preload="none" for true lazy loading -->
         <video 
           [src]="getVideoUrl()" 
           controls 
           class="video-player"
           [poster]="getCoverImageUrl()"
-          preload="metadata"
+          preload="none"
           [style.aspect-ratio]="'16/9'"
           width="1200"
           height="675"
-          (play)="onVideoPlay()">
+          (play)="onVideoPlay()"
+          (loadstart)="onVideoLoadStart()"
+          (canplay)="onVideoCanPlay()">
           Je browser ondersteunt geen video.
         </video>
       </div>
@@ -30,7 +39,7 @@
           </button>
         </div>
       </div>
-    </div>    <div class="video-info">
+    </div><div class="video-info">
       <h1 class="video-title">{{ video.title }}</h1>
       
       <div class="video-stats">
