@@ -53,12 +53,11 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
-  <!-- Privacy page -->
+    <!-- Privacy page -->
   <url>
     <loc>https://bitzomax.nl/privacy</loc>
     <lastmod>2025-06-13</lastmod>
-    <changefreq>quarterly</changefreq>
+    <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   
@@ -66,7 +65,7 @@
   <url>
     <loc>https://bitzomax.nl/terms</loc>
     <lastmod>2025-06-13</lastmod>
-    <changefreq>quarterly</changefreq>
+    <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   
@@ -84,24 +83,26 @@
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
-  
-  <!-- Sample video pages with video markup -->
+    <!-- Sample video pages with video markup -->
   <url>
     <loc>https://bitzomax.nl/video/1</loc>
-    <lastmod>2025-06-13</lastmod>
+    <lastmod>2025-06-13T10:00:00+01:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <video:video>
       <video:thumbnail_loc>https://bitzomax.nl/uploads/covers/sample-thumbnail.jpg</video:thumbnail_loc>
       <video:title>Nederlandse Video Content</video:title>
-      <video:description>Bekijk Nederlandse video content op Bitzomax streaming platform</video:description>
+      <video:description>Bekijk Nederlandse video content op Bitzomax streaming platform. Deze video toont de beste Nederlandse entertainment content.</video:description>
+      <video:content_loc>https://bitzomax.nl/uploads/videos/sample-video.mp4</video:content_loc>
+      <video:player_loc>https://bitzomax.nl/video/1</video:player_loc>
       <video:duration>180</video:duration>
-      <video:publication_date>2025-06-13</video:publication_date>
+      <video:publication_date>2025-06-13T10:00:00+01:00</video:publication_date>
+      <video:upload_date>2025-06-13T10:00:00+01:00</video:upload_date>
       <video:family_friendly>yes</video:family_friendly>
       <video:live>no</video:live>
       <video:requires_subscription>no</video:requires_subscription>
       <video:uploader info="https://bitzomax.nl">Bitzomax</video:uploader>
-      <video:platform allow="web mobile tablet tv">all</video:platform>
+      <video:platform relationship="allow">web</video:platform>
       <video:category>Nederlandse Content</video:category>
       <video:tag>Nederlandse video</video:tag>
       <video:tag>streaming</video:tag>
@@ -135,31 +136,7 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  
-  <!-- Terms page -->
-  <url>
-    <loc>https://bitzomax.nl/terms</loc>
-    <lastmod>2025-06-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <!-- Sample video entries (these should be dynamically generated based on your videos) -->
-  <url>
-    <loc>https://bitzomax.nl/video/1</loc>
-    <lastmod>2025-06-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <video:video>
-      <video:thumbnail_loc>https://bitzomax.nl/uploads/covers/sample-thumbnail.jpg</video:thumbnail_loc>
-      <video:title>Sample Video Title</video:title>
-      <video:description>Sample video description for SEO purposes</video:description>
-      <video:content_loc>https://bitzomax.nl/uploads/videos/sample-video.mp4</video:content_loc>
-      <video:player_loc>https://bitzomax.nl/video/1</video:player_loc>
-      <video:publication_date>2025-06-07</video:publication_date>
-      <video:family_friendly>yes</video:family_friendly>
-      <video:requires_subscription>no</video:requires_subscription>
-    </video:video>
-  </url>
+    <!-- Terms page (duplicate removed) -->
+  <!-- Sample video (duplicate removed) -->
   
 </urlset>
